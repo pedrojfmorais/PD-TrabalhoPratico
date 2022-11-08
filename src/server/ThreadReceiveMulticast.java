@@ -27,7 +27,7 @@ public class ThreadReceiveMulticast extends Thread {
             InetAddress address = InetAddress.getByName(IP_MULTICAST);
 
             ms.joinGroup(address);
-            //TODO: verificar joinGroup
+            //TODO: alterar para versão comentada
             /*
             SocketAddress sa = new InetSocketAddress(address, PORT_MULTICAST);
             NetworkInterface ni = NetworkInterface.getByName("wlan1");

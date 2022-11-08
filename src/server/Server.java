@@ -14,21 +14,27 @@ public class Server {
 
         final int UDP_PORT = Integer.parseInt(args[0]);
         final String DB_PATH = args[1];
+        int myTCPPort = 0;
 
         ArrayList<Thread> allThreads = new ArrayList<>();
 
         List<Heartbeat> listaServidores = new ArrayList<>();
 
         //TODO: Testing
-        Heartbeat serverData = new Heartbeat(1, true,1,0);
-//        Heartbeat serverData = new Heartbeat(2, true,1,5);
-//        Heartbeat serverData = new Heartbeat(3, true,1,2);
+//        Heartbeat serverData = new Heartbeat(myTCPPort, true,1,0);
+//        Heartbeat serverData = new Heartbeat(myTCPPort, true,1,5);
+        Heartbeat serverData = new Heartbeat(myTCPPort, true,1,2);
         //TODO: Fim Testing
 
         ThreadReceiveMulticast trm = new ThreadReceiveMulticast(listaServidores);
         trm.start();
 
         allThreads.add(trm);
+
+        ThreadReceiveTCPConnection trtcpc = new ThreadReceiveTCPConnection(serverData);
+        trtcpc.start();
+
+        allThreads.add(trtcpc);
 
         ThreadSendHeartbeat tsh = new ThreadSendHeartbeat(serverData);
         tsh.start();
@@ -44,6 +50,7 @@ public class Server {
         trupdc.start();
 
         allThreads.add(trupdc);
+
 
 
     }

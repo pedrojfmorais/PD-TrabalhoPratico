@@ -8,7 +8,6 @@ import java.net.DatagramSocket;
 import java.util.ArrayList;
 import java.util.List;
 
-//TODO: Não testado
 public class ThreadReceiveUDPClients extends Thread{
 
     private final List<Heartbeat> listaServidores;

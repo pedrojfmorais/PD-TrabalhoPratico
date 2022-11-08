@@ -1,6 +1,8 @@
 package utils;
 
-public class ServerTCPConnection {
+import java.io.Serializable;
+
+public class ServerTCPConnection implements Serializable {
 
     private final String IP;
     private final int PORT;
