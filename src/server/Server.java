@@ -1,13 +1,20 @@
 package server;
 
+import server.communication.ThreadReceiveMulticast;
+import server.communication.ThreadReceiveUDPClients;
+import server.communication.ThreadSendHeartbeat;
+import server.model.Heartbeat;
+import server.jdbc.ConnDB;
+
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-import static utils.Constants.INVALID_NUMBER_OF_ARGUMENTS;
+import static server.model.Constants.INVALID_NUMBER_OF_ARGUMENTS;
 
 
 public class Server {
-    public static void main(String[] args) {
+    public static void main(String[] args) throws SQLException {
 
         if(args.length != 2)
             System.exit(INVALID_NUMBER_OF_ARGUMENTS);
@@ -15,6 +22,20 @@ public class Server {
         final int UDP_PORT = Integer.parseInt(args[0]);
         final String DB_PATH = args[1];
         int myTCPPort = 0;
+
+        ConnDB connDB = new ConnDB();
+        System.out.println(connDB.getVersionDB());
+
+//        connDB.addUser("pedrojfmorais", "pedro", "password");
+//        connDB.updateUser(2, "pedrojfmorais", "pedro", "pedro");
+
+        System.out.println(connDB.getUserInformation("pedro"));
+        System.out.println(connDB.getUserInformation("pedrojfmorais"));
+        System.out.println(connDB.getUserInformation("admin"));
+
+        System.out.println(connDB.verifyLogin("pedrojfmorais", "password"));
+        System.out.println(connDB.verifyLogin("admin", "admin"));
+        System.out.println(connDB.verifyLogin("pedrojfmorais", "123"));
 
         ArrayList<Thread> allThreads = new ArrayList<>();
 
