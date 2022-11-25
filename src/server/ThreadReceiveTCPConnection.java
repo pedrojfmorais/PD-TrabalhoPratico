@@ -1,7 +1,7 @@
 package server;
 
-import server.model.Heartbeat;
-import server.model.MsgTcp;
+import server.model.data.Heartbeat;
+import server.model.data.MsgTcp;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -9,8 +9,8 @@ import java.io.ObjectOutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 
-import static server.model.Constants.MSG_TCP_CLIENT_CONFIRM_CONNECTION;
-import static server.model.Constants.MSG_TCP_CLIENT_TRY_CONNECTION;
+import static server.model.data.Constants.MSG_TCP_CLIENT_CONFIRM_CONNECTION;
+import static server.model.data.Constants.MSG_TCP_CLIENT_TRY_CONNECTION;
 
 public class ThreadReceiveTCPConnection extends Thread{
 

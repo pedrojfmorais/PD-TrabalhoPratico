@@ -1,4 +1,4 @@
-package server.model;
+package server.model.data;
 
 public class Constants {
     public final static int INVALID_NUMBER_OF_ARGUMENTS = 1;

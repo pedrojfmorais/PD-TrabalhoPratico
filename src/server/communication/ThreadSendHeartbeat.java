@@ -1,6 +1,6 @@
 package server.communication;
 
-import server.model.Heartbeat;
+import server.model.data.Heartbeat;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -9,7 +9,7 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 
-import static server.model.Constants.*;
+import static server.model.data.Constants.*;
 
 public class ThreadSendHeartbeat extends Thread{
 

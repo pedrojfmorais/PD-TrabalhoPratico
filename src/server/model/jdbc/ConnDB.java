@@ -1,6 +1,6 @@
-package server.jdbc;
+package server.model.jdbc;
 
-import server.model.LoginStatus;
+import server.model.data.LoginStatus;
 
 import java.sql.*;
 

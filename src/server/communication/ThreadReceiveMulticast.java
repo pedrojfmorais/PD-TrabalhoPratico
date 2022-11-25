@@ -1,6 +1,6 @@
 package server.communication;
 
-import server.model.Heartbeat;
+import server.model.data.Heartbeat;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -10,8 +10,8 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
-import static server.model.Constants.IP_MULTICAST;
-import static server.model.Constants.PORT_MULTICAST;
+import static server.model.data.Constants.IP_MULTICAST;
+import static server.model.data.Constants.PORT_MULTICAST;
 
 public class ThreadReceiveMulticast extends Thread {
 

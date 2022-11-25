@@ -1,14 +1,14 @@
 package client;
 
-import server.model.MsgTcp;
-import server.model.ServerTCPConnection;
+import server.model.data.MsgTcp;
+import server.model.data.ServerTCPConnection;
 
 import java.io.*;
 import java.net.*;
 import java.util.ArrayList;
 import java.util.Objects;
 
-import static server.model.Constants.*;
+import static server.model.data.Constants.*;
 
 public class Client {
     public static void main(String[] args) throws IOException, ClassNotFoundException {

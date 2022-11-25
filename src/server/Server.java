@@ -3,14 +3,14 @@ package server;
 import server.communication.ThreadReceiveMulticast;
 import server.communication.ThreadReceiveUDPClients;
 import server.communication.ThreadSendHeartbeat;
-import server.model.Heartbeat;
-import server.jdbc.ConnDB;
+import server.model.data.Heartbeat;
+import server.model.jdbc.ConnDB;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-import static server.model.Constants.INVALID_NUMBER_OF_ARGUMENTS;
+import static server.model.data.Constants.INVALID_NUMBER_OF_ARGUMENTS;
 
 
 public class Server {

@@ -1,11 +1,11 @@
 package server;
 
-import server.model.Heartbeat;
+import server.model.data.Heartbeat;
 
 import java.util.Date;
 import java.util.List;
 
-import static server.model.Constants.TIMEOUT_REMOVE_OLD_SERVERS_MILLISECONDS;
+import static server.model.data.Constants.TIMEOUT_REMOVE_OLD_SERVERS_MILLISECONDS;
 
 public class ThreadRemoveOldServers extends Thread{
 
