@@ -27,8 +27,9 @@ public class ThreadRemoveOldServers extends Thread{
                 synchronized (listaServidores){
                     listaServidores.removeIf(
                             server ->
-                                    (curTime.getTime() - server.getReceivedAt().getTime())
-                                            > TIMEOUT_REMOVE_OLD_SERVERS_MILLISECONDS);
+                                    ((curTime.getTime() - server.getReceivedAt().getTime())
+                                            > TIMEOUT_REMOVE_OLD_SERVERS_MILLISECONDS)
+                                     || !server.isDISPONIVEL());
                 }
 
                 //TODO: Testing

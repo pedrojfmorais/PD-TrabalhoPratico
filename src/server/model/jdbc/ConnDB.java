@@ -6,12 +6,11 @@ import java.sql.*;
 
 public class ConnDB
 {
-    private final String DATABASE_URL = "jdbc:sqlite:PD-2022-23-TP.db";
     private Connection dbConn;
 
-    public ConnDB() throws SQLException
+    public ConnDB(String DB_PATH) throws SQLException
     {
-        dbConn = DriverManager.getConnection(DATABASE_URL);
+        dbConn = DriverManager.getConnection("jdbc:sqlite:"+DB_PATH);
     }
 
     public void close() throws SQLException

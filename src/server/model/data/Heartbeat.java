@@ -6,9 +6,10 @@ import java.util.Date;
 public class Heartbeat implements Comparable<Heartbeat>, Serializable {
     private String ipServer;
     private int TCP_PORT;
-    private final boolean DISPONIVEL;
-    private final int LOCAL_DB_VERSION;
-    private final int NUMERO_LIGACOES_TCP;
+
+    private boolean DISPONIVEL;
+    private int LOCAL_DB_VERSION;
+    private int NUMERO_LIGACOES_TCP;
     private Date receivedAt;
 
     public Heartbeat(int TCP_PORT, boolean DISPONIVEL, int LOCAL_DB_VERSION, int NUMERO_LIGACOES_TCP) {
@@ -30,12 +31,24 @@ public class Heartbeat implements Comparable<Heartbeat>, Serializable {
         return DISPONIVEL;
     }
 
+    public void setDISPONIVEL(boolean DISPONIVEL) {
+        this.DISPONIVEL = DISPONIVEL;
+    }
+
     public int getLOCAL_DB_VERSION() {
         return LOCAL_DB_VERSION;
     }
 
+    public void setLOCAL_DB_VERSION(int LOCAL_DB_VERSION) {
+        this.LOCAL_DB_VERSION = LOCAL_DB_VERSION;
+    }
+
     public int getNUMERO_LIGACOES_TCP() {
         return NUMERO_LIGACOES_TCP;
+    }
+
+    public void setNUMERO_LIGACOES_TCP(int NUMERO_LIGACOES_TCP) {
+        this.NUMERO_LIGACOES_TCP = NUMERO_LIGACOES_TCP;
     }
 
     public String getIpServer() {

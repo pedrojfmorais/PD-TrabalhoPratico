@@ -40,7 +40,10 @@ public class ThreadReceiveUDPClients extends Thread{
                 synchronized (listaServidores) {
 
                     for (Heartbeat h : listaServidores)
-                        listaServidoresAEnviar.add(new ServerTCPConnection(h.getIpServer(), h.getTCP_PORT()));
+                        if(h.isDISPONIVEL())
+                            listaServidoresAEnviar.add(
+                                    new ServerTCPConnection(h.getIpServer(), h.getTCP_PORT())
+                            );
                 }
 
                 oos.writeObject(listaServidoresAEnviar);
