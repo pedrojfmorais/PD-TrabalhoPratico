@@ -2,8 +2,6 @@ package server;
 
 import server.model.Server;
 
-import java.sql.SQLException;
-
 import static server.model.data.Constants.INVALID_NUMBER_OF_ARGUMENTS;
 
 

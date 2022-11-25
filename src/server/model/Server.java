@@ -15,7 +15,6 @@ import java.util.List;
 
 public class Server {
     private final int UDP_PORT;
-    private final String DB_PATH;
     private int myTCPPort = 0;
     private int localDbVersion = 0;
     private ConnDB connDB;
@@ -26,10 +25,9 @@ public class Server {
     public Server(int udp_port, String db_path){
 
         UDP_PORT = udp_port;
-        DB_PATH = db_path;
 
         try {
-            connDB = new ConnDB(DB_PATH);
+            connDB = new ConnDB(db_path);
         } catch (SQLException e) {
             connDB = null;
         }
@@ -63,6 +61,9 @@ public class Server {
             //TODO: estabelece conexão TCP e atualiza base de dados
             System.out.println("Estabelece conexão TCP e atualiza base de dados");
 
+
+        //Quando tudo estiver ok
+        startThreads();
     }
 
     public void testes() throws SQLException {

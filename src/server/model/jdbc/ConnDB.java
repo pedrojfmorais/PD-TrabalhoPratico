@@ -13,6 +13,11 @@ public class ConnDB
         dbConn = DriverManager.getConnection("jdbc:sqlite:"+DB_PATH);
     }
 
+    public void setConnDB(String DB_PATH) throws SQLException
+    {
+        dbConn = DriverManager.getConnection("jdbc:sqlite:"+DB_PATH);
+    }
+
     public void close() throws SQLException
     {
         if (dbConn != null)
