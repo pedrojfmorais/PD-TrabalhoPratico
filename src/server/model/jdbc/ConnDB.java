@@ -10,7 +10,7 @@ public class ConnDB
 
     public ConnDB(String DB_PATH) throws SQLException
     {
-        dbConn = DriverManager.getConnection("jdbc:sqlite:"+DB_PATH);
+        dbConn = DriverManager.getConnection("jdbc:sqlite:" + DB_PATH);
     }
 
     public void setConnDB(String DB_PATH) throws SQLException
@@ -42,6 +42,17 @@ public class ConnDB
         statement.close();
 
         return version;
+    }
+
+    public void incrementDBVersion() throws SQLException
+    {
+        int versaoAtual = getVersionDB();
+
+        Statement statement = dbConn.createStatement();
+
+        String sqlQuery = "UPDATE database_version SET version='" + (versaoAtual + 1) + "'";
+        statement.executeUpdate(sqlQuery);
+        statement.close();
     }
 
     public void insertUser(String username, String nome, String password) throws SQLException {

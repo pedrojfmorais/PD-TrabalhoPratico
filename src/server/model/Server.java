@@ -38,6 +38,7 @@ public class Server {
     }
 
     public void start() throws InterruptedException {
+
         ThreadReceiveMulticast trm = new ThreadReceiveMulticast(listaServidores);
         trm.start();
 

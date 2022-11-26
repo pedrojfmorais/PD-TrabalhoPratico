@@ -6,7 +6,6 @@ import java.util.Date;
 public class Heartbeat implements Comparable<Heartbeat>, Serializable {
     private String ipServer;
     private int TCP_PORT;
-
     private boolean DISPONIVEL;
     private int LOCAL_DB_VERSION;
     private int NUMERO_LIGACOES_TCP;
