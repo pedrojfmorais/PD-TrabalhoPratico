@@ -1,5 +1,6 @@
 package client;
 
+import server.model.data.LoginStatus;
 import server.model.data.MsgTcp;
 import server.model.data.ServerTCPConnection;
 
@@ -154,7 +155,7 @@ public class Client {
 
     // Send information about account to Server
     public static boolean sendAccountInfoServer(ServerTCPConnection server, String info) throws IOException {
-
+        LoginStatus loginStatus = LoginStatus.WRONG_CREDENTIALS;
         Socket cliSocket = new Socket(server.getIP(), server.getPORT());
 
         cliSocket.setSoTimeout(TIMEOUT_WAIT_TCP_CONFIRMATION);
@@ -164,11 +165,14 @@ public class Client {
 
         oos.writeObject(info);
         try {
-            return (boolean)ois.readObject();
+            loginStatus = (LoginStatus) ois.readObject();
 
         } catch (ClassNotFoundException ignored) {
 
         }
-        return false;
+        return switch (loginStatus) {
+            case WRONG_CREDENTIALS -> false;
+            case SUCCESSFUL_ADMIN_USER, SUCCESSFUL_NORMAL_USER -> true;
+        };
     }
 }
