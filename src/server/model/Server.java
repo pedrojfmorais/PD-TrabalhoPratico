@@ -1,6 +1,6 @@
 package server.model;
 
-import server.ThreadReceiveTCPConnection;
+import server.communication.ThreadReceiveNewTCPConnection;
 import server.ThreadRemoveOldServers;
 import server.communication.ThreadReceiveMulticast;
 import server.communication.ThreadReceiveUDPClients;
@@ -64,6 +64,7 @@ public class Server {
 
 
         //Quando tudo estiver ok
+        serverData.setDISPONIVEL(true);
         startThreads();
     }
 
@@ -87,7 +88,7 @@ public class Server {
     public void startThreads(){
 
 
-        ThreadReceiveTCPConnection trtcpc = new ThreadReceiveTCPConnection(serverData);
+        ThreadReceiveNewTCPConnection trtcpc = new ThreadReceiveNewTCPConnection(serverData, connDB);
         trtcpc.start();
 
         allThreads.add(trtcpc);

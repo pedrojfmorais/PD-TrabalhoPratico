@@ -65,12 +65,12 @@ public class ConnDB
         statement.close();
     }
 
-    public void updateUser(int id, String username, String nome, String password) throws SQLException
+    public void updateUser(String oldUsername, String username, String nome, String password) throws SQLException
     {
         Statement statement = dbConn.createStatement();
 
         String sqlQuery = "UPDATE utilizador SET username='" + username + "', nome='" + nome + "', " +
-                "password='" + password + "' WHERE id=" + id;
+                "password='" + password + "' WHERE username=" + oldUsername;
         statement.executeUpdate(sqlQuery);
         statement.close();
     }
@@ -96,6 +96,25 @@ public class ConnDB
         statement.close();
 
         return result;
+    }
+
+    public boolean verifyUserExists(String username, String nome) throws SQLException {
+        boolean res = false;
+        Statement statement = dbConn.createStatement();
+
+        String sqlQuery = "SELECT * FROM utilizador WHERE username='" + username + "' or nome='" + nome + "'";
+
+        ResultSet resultSet = statement.executeQuery(sqlQuery);
+
+        while(resultSet.next())
+        {
+            res = true;
+        }
+
+        resultSet.close();
+        statement.close();
+
+        return res;
     }
 
     public String getUserInformation(String username) throws SQLException {

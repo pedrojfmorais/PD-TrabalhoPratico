@@ -9,7 +9,4 @@ public class Constants {
     public final static int TIMEOUT_STARTUP_PHASE = 5 * 1000; //TODO: 30
     public final static int TIMEOUT_WAIT_TCP_CONFIRMATION = 5 * 1000;
 
-    public final static String MSG_TCP_CLIENT_TRY_CONNECTION = "HELLO";
-    public final static String MSG_TCP_CLIENT_CONFIRM_CONNECTION = "ACK";
-
 }

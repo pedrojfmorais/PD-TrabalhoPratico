@@ -3,19 +3,19 @@ package server.model.data;
 import java.io.Serializable;
 
 public class MsgTcp implements Serializable {
-    private final String MSG_TYPE;
-    private final Object obj;
+    private final TypeMsgTCP MSG_TYPE;
+    private final String msg;
 
-    public MsgTcp(String MSG_TYPE, Object obj) {
+    public MsgTcp(TypeMsgTCP MSG_TYPE, String msg) {
         this.MSG_TYPE = MSG_TYPE;
-        this.obj = obj;
+        this.msg = msg;
     }
 
-    public String getMSG_TYPE() {
+    public TypeMsgTCP getMSG_TYPE() {
         return MSG_TYPE;
     }
 
-    public Object getObj() {
-        return obj;
+    public String getMsg() {
+        return msg;
     }
 }
