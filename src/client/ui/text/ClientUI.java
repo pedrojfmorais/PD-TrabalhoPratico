@@ -13,6 +13,12 @@ public class ClientUI {
 
     private boolean finish = false;
 
+    public static void showMessage(String msg, boolean atualizar){
+        System.out.println("\n!!!" + msg + "!!!\n");
+        if(atualizar)
+            System.out.println("Clique enter para atualizar a consola!\n");
+    }
+
     public void start() throws IOException, ClassNotFoundException {
         while (!finish){
             switch (fsm.getState()){
@@ -32,21 +38,15 @@ public class ClientUI {
 
     private void inicioUI() {
         switch (PAInput.chooseOption("Bem vindo! \n", "Login", "Registar", "Sair")){
-            case 1 -> {
-                if(!fsm.login(
-                        PAInput.readString("Insira o username: ", true),
-                        PAInput.readString("Insira a password: ", false)
-                ))
-                    System.out.println("Credenciais incorretas!");
-            }
-            case 2 -> {
-                if(!fsm.register(
-                        PAInput.readString("Insira o username: ", true),
-                        PAInput.readString("Insira o nome: ", true),
-                        PAInput.readString("Insira a password: ", false)
-                ))
-                    System.out.println("Erro a registar o utilizador!");
-            }
+            case 1 -> fsm.login(
+                    PAInput.readString("Insira o username: ", true),
+                    PAInput.readString("Insira a password: ", false)
+            );
+            case 2 -> fsm.register(
+                    PAInput.readString("Insira o username: ", true),
+                    PAInput.readString("Insira o nome: ", true),
+                    PAInput.readString("Insira a password: ", false)
+            );
             case 3 -> finish = true;
         }
     }

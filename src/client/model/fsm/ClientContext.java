@@ -12,7 +12,7 @@ public class ClientContext {
     private IClientState state;
 
     public ClientContext(String IP_SERVER, int PORT_UDP){
-        this.data = new Client(IP_SERVER, PORT_UDP);
+        this.data = new Client(IP_SERVER, PORT_UDP, this);
         this.state = ClientState.NO_SERVER_CONNECTED.createState(this, data);
         pcs = new PropertyChangeSupport(this);
     }
@@ -33,12 +33,12 @@ public class ClientContext {
         return state.tryConnectToServer();
     }
 
-    public boolean login(String username, String password){
-        return state.login(username, password);
+    public void login(String username, String password){
+        state.login(username, password);
     }
 
-    public boolean register(String username, String nome, String password){
-        return state.register(username, nome, password);
+    public void register(String username, String nome, String password){
+        state.register(username, nome, password);
     }
 
     //TODO: tudo

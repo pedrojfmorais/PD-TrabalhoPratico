@@ -25,13 +25,11 @@ abstract class ClientAdapter implements IClientState{
     }
 
     @Override
-    public boolean login(String username, String password) {
-        return false;
+    public void login(String username, String password) {
     }
 
     @Override
-    public boolean register(String username, String nome, String password) {
-        return false;
+    public void register(String username, String nome, String password) {
     }
 
     @Override

@@ -49,21 +49,44 @@ public final class PAInput {
     }
 
     public static Integer chooseOption(String title, String ... options) {
+        String value;
+        Scanner scanner;
+
         int option = -1;
-        do {
-            if (title != null)
-                System.out.println(System.lineSeparator()+title);
-            System.out.println();
-            for(int i = 0; i < options.length; i++) {
-                System.out.printf("%3d - %s\n",i+1,options[i]);
-            }
-            System.out.print("\nOption: ");
-            if (sc.hasNextInt())
-                option = sc.nextInt();
-            sc.nextLine();
-        } while (option < 1 || option > options.length);
+
+        if (title != null)
+            System.out.println(System.lineSeparator()+title);
+        System.out.println();
+        for(int i = 0; i < options.length; i++) {
+            System.out.printf("%3d - %s\n",i+1,options[i]);
+        }
+        System.out.print("\nOption: ");
+
+        value = sc.nextLine();
+        scanner = new Scanner(value);
+
+        if (scanner.hasNextInt())
+            option = scanner.nextInt();
+
         return option;
     }
+//    public static Integer chooseOption(String title, String ... options) {
+//        int option = -1;
+//        do {
+//            if (title != null)
+//                System.out.println(System.lineSeparator()+title);
+//            System.out.println();
+//            for(int i = 0; i < options.length; i++) {
+//                System.out.printf("%3d - %s\n",i+1,options[i]);
+//            }
+//            System.out.print("\nOption: ");
+//            if (sc.hasNextInt())
+//                option = sc.nextInt();
+//            sc.nextLine();
+//
+//        } while (option < 1 || option > options.length);
+//        return option;
+//    }
 
     public static Long readLong(String title) {
         while (true) {

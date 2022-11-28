@@ -8,8 +8,8 @@ public interface IClientState {
     boolean tryConnectToServer() throws IOException, ClassNotFoundException;
 
     //INICIO
-    boolean login(String username, String password);
-    boolean register(String username, String nome, String password);
+    void login(String username, String password);
+    void register(String username, String nome, String password);
 
     //CONSULTA_PESQUISA_ESPETACULOS
     boolean inserirEspetaculo(String filename);

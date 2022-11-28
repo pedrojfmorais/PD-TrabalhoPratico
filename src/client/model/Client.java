@@ -2,6 +2,7 @@ package client.model;
 
 import client.model.communication.ThreadTCPWithServer;
 import client.model.data.User;
+import client.model.fsm.ClientContext;
 import server.model.data.LoginStatus;
 import server.model.data.ServerTCPConnection;
 
@@ -14,15 +15,17 @@ import static client.model.communication.StartConnectionToServer.testTCPServer;
 
 public class Client {
 
+    ClientContext fsm;
     private User user;
     ThreadTCPWithServer tcpConnection;
     final String IP_SERVER;
     final int PORT_UDP;
 
-    public Client(String IP_SERVER, int PORT_UDP){
+    public Client(String IP_SERVER, int PORT_UDP, ClientContext fsm){
         user = new User(null, LoginStatus.WRONG_CREDENTIALS);
         this.IP_SERVER = IP_SERVER;
         this.PORT_UDP = PORT_UDP;
+        this.fsm = fsm;
     }
 
     public User getUser() {
@@ -48,7 +51,7 @@ public class Client {
             return false;
 
         tcpConnection = new ThreadTCPWithServer(
-                this,
+                fsm,
                 new Socket(serverTCPConnected.getIP(), serverTCPConnected.getPORT())
         );
         tcpConnection.start();
