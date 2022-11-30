@@ -119,12 +119,13 @@ public class ConsultaPesquisaEspetaculosState extends ClientAdapter {
         }
     }
 
+    // TODO (Dúvida): why is this here? que dados podem ser alterados?
     @Override
     public void editarDadosUtilizador(String... dados) {
         try {
 
             data.getTcpConnection().sendMsg(
-                    new MsgTcp(TypeMsgTCP.CLIENT, "pesquisa espetaculo", List.of(dados))
+                    new MsgTcp(TypeMsgTCP.CLIENT, "editar utilizador", List.of(dados))
             );
         } catch (IOException | ClassNotFoundException e) {
             throw new RuntimeException(e);

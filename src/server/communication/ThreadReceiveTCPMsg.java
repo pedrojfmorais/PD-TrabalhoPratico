@@ -1,5 +1,6 @@
 package server.communication;
 
+import server.model.data.Espetaculo;
 import server.model.data.LoginStatus;
 import server.model.data.MsgTcp;
 import server.model.data.TypeMsgTCP;
@@ -109,6 +110,51 @@ public class ThreadReceiveTCPMsg extends Thread{
                                     TypeMsgTCP.REPLY_SERVER,
                                     "register",
                                     List.of(insertUser)
+                            )
+                    );
+                }
+            }
+            case "eliminar espetaculo" -> {
+                boolean result = false;
+                int id = (int) msg.getMsg().get(0);
+                if(!connDB.verifyEspetaculoExists(id))
+                    result = connDB.eliminarEspetaculo(id);
+
+                sendMsg(
+                        new MsgTcp(
+                                TypeMsgTCP.REPLY_SERVER,
+                                "eliminar espetaculo",
+                                List.of(result)
+                        )
+                );
+            }
+            case "editar espetaculo" -> {
+                boolean result = false;
+                int id = (int) msg.getMsg().get(0);
+                if(!connDB.verifyEspetaculoExists(id))
+                    result = connDB.editarEspetaculo(id);
+
+                sendMsg(
+                        new MsgTcp(
+                                TypeMsgTCP.REPLY_SERVER,
+                                "editar espetaculo",
+                                List.of(result)
+                        )
+                );
+            }
+            case "selecionar espetaculo" -> {
+                // TODO ???
+            }
+            case "pesquisa espetaculo" -> {
+                if(msg.getMsg().get(0) instanceof String filtro) {
+
+                    List<Espetaculo> espetaculos = new ArrayList<>(connDB.pesquisarEspetaculo(filtro));
+
+                    sendMsg(
+                            new MsgTcp(
+                                    TypeMsgTCP.REPLY_SERVER,
+                                    "pesquisa espetaculo",
+                                    List.of(espetaculos)
                             )
                     );
                 }

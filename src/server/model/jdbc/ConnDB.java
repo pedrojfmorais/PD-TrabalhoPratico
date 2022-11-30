@@ -6,6 +6,7 @@ import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.sql.*;
+import java.util.ArrayList;
 import java.util.List;
 
 public class ConnDB
@@ -175,6 +176,100 @@ public class ConnDB
         statement.close();
 
         return sb.toString().isEmpty() ? null : sb.toString();
+    }
+
+    public boolean verifyEspetaculoExists(int id) throws SQLException {
+        boolean res = false;
+        Statement statement = dbConn.createStatement();
+
+        String sqlQuery = "SELECT * FROM espetaculo WHERE id='" + id + "'";
+
+        ResultSet resultSet = statement.executeQuery(sqlQuery);
+
+        while(resultSet.next())
+            res = true;
+
+        resultSet.close();
+        statement.close();
+
+        return res;
+    }
+
+    // TODO: (Dúvida) Retorno ??
+    public boolean eliminarEspetaculo(int id) throws SQLException {
+        boolean res = false;
+        Statement statement = dbConn.createStatement();
+
+        String sqlQuery = "DELETE * FROM espetaculo WHERE id='" + id + "'";
+
+        statement.executeUpdate(sqlQuery);
+        statement.close();
+
+        return true;
+    }
+
+    // TODO: (Dúvida) Retorno ??
+    public boolean editarEspetaculo(int id) throws SQLException {
+        Statement statement = dbConn.createStatement();
+
+        String sqlQuery = "UPDATE espetaculo SET visivel='" + 0 + "' WHERE id=" + id;
+        statement.executeUpdate(sqlQuery);
+        statement.close();
+
+        incrementDBVersion();
+
+        return true;
+    }
+
+    // TODO (Dúvida): Guardar data e hora separadas na BD ?
+    public List<Espetaculo> pesquisarEspetaculo(String filtro) throws SQLException {
+
+        Espetaculo espetaculo = null;
+        List<Espetaculo> espetaculos = new ArrayList<>();
+
+        Statement statement = dbConn.createStatement();
+
+        String sqlQuery = "SELECT * FROM espetaculo WHERE descricao='" + filtro + "'";
+        ResultSet resultSet = statement.executeQuery(sqlQuery);
+
+        while(resultSet.next())
+        {
+            String sqlQueryLugares = "SELECT lugar.id, lugar.fila, lugar.assento, lugar.preco FROM lugar INNER JOIN espetaculo ON lugar.espetaculo_id=espetaculo.id WHERE espetaculo.id='" + resultSet.getInt("id") + "'";
+            ResultSet resultSetLugares = statement.executeQuery(sqlQueryLugares);
+
+            List<Lugar> lugares = new ArrayList<>();
+
+            while(resultSetLugares.next()) {
+                Lugar lugar = new Lugar(
+                        resultSetLugares.getInt("id"),
+                        resultSetLugares.getString("fila"),
+                        resultSetLugares.getString("assento"),
+                        resultSetLugares.getDouble("preco")
+                );
+                lugares.add(lugar);
+            }
+
+            espetaculo = new Espetaculo(
+                    resultSet.getInt("id"),
+                    resultSet.getInt("visivel") == 1,
+                    resultSet.getString("descricao"),
+                    resultSet.getString("tipo"),
+                    resultSet.getString("data_hora"),
+                    resultSet.getString("data_hora"),
+                    resultSet.getInt("duracao"),
+                    resultSet.getString("local"),
+                    resultSet.getString("localidade"),
+                    resultSet.getString("pais"),
+                    resultSet.getString("classificacao_etaria"),
+                    lugares
+            );
+            espetaculos.add(espetaculo);
+        }
+
+        resultSet.close();
+        statement.close();
+
+        return espetaculos;
     }
 /*
     public void listUsers(String whereName) throws SQLException

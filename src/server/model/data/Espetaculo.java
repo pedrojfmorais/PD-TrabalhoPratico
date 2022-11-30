@@ -3,6 +3,7 @@ package server.model.data;
 import java.util.List;
 
 public class Espetaculo {
+    int id;
     boolean visibilidade;
     String designacao;
     String tipo;
@@ -15,7 +16,8 @@ public class Espetaculo {
     String classificacao;
     List<Lugar> lugares;
 
-    public Espetaculo(boolean visibilidade, String designacao, String tipo, String data, String hora, int duracao, String local, String localidade, String pais, String classificacao, List<Lugar> lugares) {
+    public Espetaculo(int id, boolean visibilidade, String designacao, String tipo, String data, String hora, int duracao, String local, String localidade, String pais, String classificacao, List<Lugar> lugares) {
+        this.id = id;
         this.visibilidade = visibilidade;
         this.designacao = designacao;
         this.tipo = tipo;
