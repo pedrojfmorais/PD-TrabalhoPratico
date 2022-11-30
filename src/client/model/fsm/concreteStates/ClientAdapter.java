@@ -13,7 +13,7 @@ abstract class ClientAdapter implements IClientState{
     ClientContext context;
     Client data;
 
-    public ClientAdapter(ClientContext context, Client data){
+    public ClientAdapter(ClientContext context, Client data) {
         this.context = context;
         this.data = data;
     }
@@ -41,7 +41,6 @@ abstract class ClientAdapter implements IClientState{
     public boolean inserirEspetaculo(String filename) {
         if(isAdminUser())
             return false;
-
         return true;
     }
 
@@ -85,9 +84,7 @@ abstract class ClientAdapter implements IClientState{
     }
 
     @Override
-    public boolean pagarReserva(int id) {
-        return false;
-    }
+    public void pagarReserva(int id) { return;}
 
     @Override
     public boolean eliminarReservaNaoPaga(int id) {

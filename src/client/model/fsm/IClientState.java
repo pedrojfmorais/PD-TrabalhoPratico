@@ -22,7 +22,7 @@ public interface IClientState {
     boolean logout();
 
     //MINHAS_RESERVAS
-    boolean pagarReserva(int id);
+    void pagarReserva(int id);
     boolean eliminarReservaNaoPaga(int id);
     String mostrarReservas(boolean reservaPaga);
     boolean voltarPesquisaEspetaculos();
