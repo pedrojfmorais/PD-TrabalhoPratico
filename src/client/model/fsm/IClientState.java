@@ -28,10 +28,10 @@ public interface IClientState {
     boolean voltarPesquisaEspetaculos();
 
     //SELECIONA_ESPETACULO
-    String mostraLugaresDisponiveis();
+    void mostraLugaresDisponiveis();
     void selecionaLugaresPretendidos(String ... lugares);
-    boolean validarReserva();
-    boolean cancelarReserva();
+    void validarReserva();
+    void cancelarReserva(int id);
 
     //Todos
     ClientState getState();

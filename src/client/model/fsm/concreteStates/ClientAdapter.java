@@ -75,7 +75,7 @@ abstract class ClientAdapter implements IClientState{
     }
 
     @Override
-    public String mostraLugaresDisponiveis() {
+    public void mostraLugaresDisponiveis() {
         return null;
     }
 
@@ -83,12 +83,10 @@ abstract class ClientAdapter implements IClientState{
     public void selecionaLugaresPretendidos(String... lugares) { }
 
     @Override
-    public boolean validarReserva() {
-        return false;
+    public void validarReserva() {
     }
 
     @Override
-    public boolean cancelarReserva() {
-        return false;
+    public void cancelarReserva(int id) {
     }
 }
