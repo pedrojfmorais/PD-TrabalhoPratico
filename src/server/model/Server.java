@@ -41,7 +41,11 @@ public class Server {
     }
 
     public void start() throws InterruptedException {
-
+        try {
+            connDB.createDB();
+        } catch (SQLException | IOException e) {
+            throw new RuntimeException(e);
+        }
         ThreadReceiveMulticast trm = new ThreadReceiveMulticast(listaServidores);
         trm.start();
 

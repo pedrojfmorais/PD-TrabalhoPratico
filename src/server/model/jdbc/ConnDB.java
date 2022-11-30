@@ -42,6 +42,21 @@ public class ConnDB
         statement.close();
     }
 
+    public void cleanDB(){
+        //TODO: truncate todas tabelas
+    }
+
+    //TODO: ver folha
+    public void exportDB() throws SQLException {
+        Statement stmt = dbConn.createStatement();
+
+        String filename = "outfile.txt";
+        String tablename = "utilizador";
+        stmt.executeUpdate("SELECT * INTO OUTFILE '" + filename + "' FROM " + tablename);
+
+        stmt.close();
+    }
+
     public int getVersionDB() throws SQLException{
 
         int version = 0;
