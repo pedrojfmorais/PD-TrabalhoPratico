@@ -4,6 +4,7 @@ import client.model.Client;
 import client.model.fsm.ClientContext;
 import client.model.fsm.ClientState;
 import client.model.fsm.IClientState;
+import server.model.data.LoginStatus;
 
 import java.io.IOException;
 
@@ -15,6 +16,10 @@ abstract class ClientAdapter implements IClientState{
     public ClientAdapter(ClientContext context, Client data){
         this.context = context;
         this.data = data;
+    }
+
+    private boolean isAdminUser() {
+        return data.getUser().getStatus() == LoginStatus.SUCCESSFUL_ADMIN_USER;
     }
 
     void changeState(ClientState state){context.changeState(state.createState(context, data));}
@@ -34,16 +39,23 @@ abstract class ClientAdapter implements IClientState{
 
     @Override
     public boolean inserirEspetaculo(String filename) {
-        return false;
+        if(isAdminUser())
+            return false;
+
+        return true;
     }
 
     @Override
     public boolean eliminarEspetaculo(int id) {
+        if(isAdminUser())
+            return false;
         return false;
     }
 
     @Override
     public boolean editarEstadoEspetaculo(int id) {
+        if(isAdminUser())
+            return false;
         return false;
     }
 

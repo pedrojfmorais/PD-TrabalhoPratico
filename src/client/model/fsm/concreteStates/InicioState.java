@@ -8,6 +8,7 @@ import server.model.data.MsgTcp;
 import server.model.data.TypeMsgTCP;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 public class InicioState extends ClientAdapter {
@@ -20,11 +21,10 @@ public class InicioState extends ClientAdapter {
     public void login(String username, String password) {
         String result = null;
         try {
-            data.getTcpConnection().sendMsg(new MsgTcp(
-                    TypeMsgTCP.CLIENT,
-                    "login",
-                    List.of(username, password)
-            ));
+
+            data.getTcpConnection().sendMsg(
+                    new MsgTcp(TypeMsgTCP.CLIENT, "login", List.of(username, password))
+            );
         } catch (IOException | ClassNotFoundException e) {
             throw new RuntimeException(e);
         }
@@ -35,9 +35,8 @@ public class InicioState extends ClientAdapter {
         try {
             data.getTcpConnection().sendMsg(new MsgTcp(
                     TypeMsgTCP.CLIENT,
-                    "register",
-                    List.of(username, nome, password)
-            ));
+                    "register", List.of(username, nome, password))
+            );
         } catch (IOException | ClassNotFoundException e) {
             throw new RuntimeException(e);
         }
