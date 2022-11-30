@@ -9,6 +9,8 @@ import server.model.data.Constants;
 import server.model.data.Heartbeat;
 import server.model.jdbc.ConnDB;
 
+import java.io.File;
+import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
@@ -18,6 +20,7 @@ public class Server {
     private int myTCPPort = 0;
     private int localDbVersion = 0;
     private ConnDB connDB;
+    private final String BD_FILE;
     private ArrayList<Thread> allThreads;
     private Heartbeat serverData;
     private List<Heartbeat> listaServidores;
@@ -25,7 +28,7 @@ public class Server {
     public Server(int udp_port, String db_path){
 
         UDP_PORT = udp_port;
-
+        this.BD_FILE = db_path;
         try {
             connDB = new ConnDB(db_path);
         } catch (SQLException e) {
@@ -46,7 +49,7 @@ public class Server {
 
         Thread.sleep(Constants.TIMEOUT_STARTUP_PHASE);
 
-        boolean desatualizado = connDB == null;
+        boolean desatualizado = new File(BD_FILE).length() == 0;
 
         if(!desatualizado)
             for (var h : listaServidores)
@@ -55,9 +58,14 @@ public class Server {
                     break;
                 }
 
-        if(desatualizado && listaServidores.isEmpty())
-            //TODO: cria nova base de dados
-            System.out.println("Criar nova base de dados");
+        if(desatualizado && listaServidores.isEmpty()) {
+            try {
+                connDB.createDB();
+            } catch (IOException | SQLException e) {
+                System.out.println("!!! Erro a criar a base de dados. !!!");
+                e.printStackTrace();
+            }
+        }
         else if(desatualizado)
             //TODO: estabelece conexão TCP e atualiza base de dados
             System.out.println("Estabelece conexão TCP e atualiza base de dados");

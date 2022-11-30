@@ -1,8 +1,13 @@
 package server.model.jdbc;
 
+import server.model.data.Constants;
 import server.model.data.LoginStatus;
 
+import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.sql.*;
+import java.util.List;
 
 public class ConnDB
 {
@@ -22,6 +27,19 @@ public class ConnDB
     {
         if (dbConn != null)
             dbConn.close();
+    }
+
+    public void createDB() throws IOException, SQLException {
+
+        Statement statement = dbConn.createStatement();
+        List<String> sqlScript = Files.readAllLines(Paths.get(Constants.DATABASE_CREATE_SCRIPT_PATH));
+        for(String script: sqlScript) {
+            if(script.startsWith("--"))
+                continue;
+
+            statement.executeUpdate(script);
+        }
+        statement.close();
     }
 
     public int getVersionDB() throws SQLException{
@@ -55,14 +73,20 @@ public class ConnDB
         statement.close();
     }
 
-    public void insertUser(String username, String nome, String password) throws SQLException {
+    public boolean insertUser(String username, String nome, String password) throws SQLException {
         Statement statement = dbConn.createStatement();
 
         String sqlQuery = "INSERT INTO utilizador (username, nome, password) " +
                 "VALUES ('" + username + "','" + nome + "','" + password + "')";
 
-        statement.executeUpdate(sqlQuery);
+        int rowsAffected = statement.executeUpdate(sqlQuery);
         statement.close();
+
+        if(rowsAffected == 1) {
+            incrementDBVersion();
+            return true;
+        }
+        return false;
     }
 
     public void updateUser(String oldUsername, String username, String nome, String password) throws SQLException
@@ -73,6 +97,8 @@ public class ConnDB
                 "password='" + password + "' WHERE username=" + oldUsername;
         statement.executeUpdate(sqlQuery);
         statement.close();
+
+        incrementDBVersion();
     }
 
     public LoginStatus verifyLogin(String username, String password) throws SQLException {
@@ -107,9 +133,7 @@ public class ConnDB
         ResultSet resultSet = statement.executeQuery(sqlQuery);
 
         while(resultSet.next())
-        {
             res = true;
-        }
 
         resultSet.close();
         statement.close();

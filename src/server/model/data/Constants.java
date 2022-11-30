@@ -8,5 +8,6 @@ public class Constants {
     public final static int TIMEOUT_REMOVE_OLD_SERVERS_MILLISECONDS = 5 * 1000; //TODO: 35
     public final static int TIMEOUT_STARTUP_PHASE = 5 * 1000; //TODO: 30
     public final static int TIMEOUT_WAIT_TCP_CONFIRMATION = 5 * 1000;
+    public final static String DATABASE_CREATE_SCRIPT_PATH = "src/server/model/jdbc/createDbScript.sql";
 
 }

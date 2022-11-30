@@ -17,14 +17,12 @@ import java.sql.SQLException;
 
 public class ThreadTCPWithServer extends Thread{
 
-    MsgTcp lastMsgSend;
     ClientContext fsm;
     Socket serverSocket;
     ObjectOutputStream oos;
     ObjectInputStream ois;
 
     public ThreadTCPWithServer(ClientContext fsm, Socket serverSocket) throws IOException {
-        lastMsgSend = null;
 
         this.fsm = fsm;
         this.serverSocket = serverSocket;
@@ -53,27 +51,30 @@ public class ThreadTCPWithServer extends Thread{
 
     public void tratarMensagem(MsgTcp msg){
 
-        if(msg.getMsg().equals("SERVER_OK"))
+        if(msg.getOperation().equals("hello") && msg.getMsg().equals("SERVER_OK"))
             return;
 
-        switch (lastMsgSend.getMsg().split(",")[0]){
+        switch (msg.getOperation()){
             case "login" -> {
-                if(msg.getMsg().equals(LoginStatus.WRONG_CREDENTIALS.toString())) {
-                    fsm.getData().getUser().setStatus(LoginStatus.WRONG_CREDENTIALS);
-                    fsm.getData().getUser().setUsername(null);
+                if(msg.getMsg().size() == 2 && msg.getMsg().get(0) instanceof LoginStatus ls){
+                    if(ls == LoginStatus.WRONG_CREDENTIALS) {
+                        fsm.getData().getUser().setStatus(LoginStatus.WRONG_CREDENTIALS);
+                        fsm.getData().getUser().setUsername(null);
 
-                    ClientUI.showMessage("Credenciais Incorretas", false);
-                } else {
-                    fsm.getData().getUser().setStatus(LoginStatus.valueOf(msg.getMsg()));
-                    fsm.getData().getUser().setUsername(lastMsgSend.getMsg().split(",")[1]);
-
-                    fsm.changeState(ClientState.CONSULTA_PESQUISA_ESPETACULOS.createState(fsm, fsm.getData()));
-
-                    ClientUI.showMessage("Bem vindo " + lastMsgSend.getMsg().split(",")[1], true);
-                }
+                        ClientUI.showMessage("Credenciais Incorretas", false);
+                    } else {
+                        if(msg.getMsg().get(1) instanceof String username) {
+                            fsm.getData().getUser().setStatus(ls);
+                            fsm.getData().getUser().setUsername(username);
+                            fsm.changeState(ClientState.CONSULTA_PESQUISA_ESPETACULOS.createState(fsm, fsm.getData()));
+                            ClientUI.showMessage("Bem vindo " + username, true);
+                        }
+                    }
+                }else
+                    ClientUI.showMessage("Erro na comunicação com o servidor!", false);
             }
             case "register" -> {
-                if(Boolean.parseBoolean(msg.getMsg()))
+                if(msg.getMsg().get(0) instanceof Boolean b && b)
                     ClientUI.showMessage("Utilizador inserido com sucesso", false);
                 else
                     ClientUI.showMessage("Erro a inserir o utilizador", false);
@@ -82,7 +83,6 @@ public class ThreadTCPWithServer extends Thread{
     }
 
     public void sendMsg(MsgTcp msgSend) throws IOException, ClassNotFoundException {
-        lastMsgSend = msgSend;
         oos.writeUnshared(msgSend);
     }
 

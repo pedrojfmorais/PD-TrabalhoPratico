@@ -8,15 +8,23 @@ import java.io.ObjectOutputStream;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
+import java.net.SocketException;
 
 import static server.model.data.Constants.*;
 
 public class ThreadSendHeartbeat extends Thread{
 
     private final Heartbeat serverData;
+    DatagramSocket ds;
 
     public ThreadSendHeartbeat(Heartbeat serverData) {
         this.serverData = serverData;
+
+        try {
+            ds = new DatagramSocket();
+        } catch (SocketException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
@@ -34,7 +42,6 @@ public class ThreadSendHeartbeat extends Thread{
     }
 
     protected void enviaHeartBeat() throws IOException {
-        DatagramSocket ds = new DatagramSocket();
 
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         ObjectOutputStream oos = new ObjectOutputStream(baos);
@@ -55,7 +62,9 @@ public class ThreadSendHeartbeat extends Thread{
         );
 
         ds.send(dpSend);
+    }
 
+    public void close(){
         ds.close();
     }
 }

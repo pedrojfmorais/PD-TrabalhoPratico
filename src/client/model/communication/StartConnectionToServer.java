@@ -56,12 +56,12 @@ public final class StartConnectionToServer {
         ObjectOutputStream oos = new ObjectOutputStream(cliSocket.getOutputStream());
         ObjectInputStream ois = new ObjectInputStream(cliSocket.getInputStream());
 
-        oos.writeUnshared(new MsgTcp(TypeMsgTCP.CLIENT, "hello"));
+        oos.writeUnshared(new MsgTcp(TypeMsgTCP.CLIENT, "hello", null));
 
         MsgTcp msgRec = (MsgTcp) ois.readObject();
 
         cliSocket.close();
 
-        return Objects.equals(msgRec.getMsg(), "SERVER_OK");
+        return Objects.equals(msgRec.getMsg().get(0), "SERVER_OK");
     }
 }

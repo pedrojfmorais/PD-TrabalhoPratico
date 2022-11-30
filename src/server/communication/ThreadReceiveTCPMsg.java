@@ -1,5 +1,6 @@
 package server.communication;
 
+import server.model.data.LoginStatus;
 import server.model.data.MsgTcp;
 import server.model.data.TypeMsgTCP;
 import server.model.jdbc.ConnDB;
@@ -10,6 +11,8 @@ import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.net.SocketException;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class ThreadReceiveTCPMsg extends Thread{
 
@@ -63,44 +66,52 @@ public class ThreadReceiveTCPMsg extends Thread{
         switch (msg.getMSG_TYPE()){
             case CLIENT  -> tratarMensagemCliente(msg);
             case CREATE_DB_COPY -> {}//TODO:
-            default -> new MsgTcp(TypeMsgTCP.REPLY_SERVER, null);
+            default -> new MsgTcp(TypeMsgTCP.REPLY_SERVER, null, null);
         }
     }
 
     public void tratarMensagemCliente(MsgTcp msg) throws SQLException, IOException {
-        String operation = msg.getMsg();
+        String operation = msg.getOperation();
         if(operation.equals("hello")) {
-            sendMsg(new MsgTcp(TypeMsgTCP.REPLY_SERVER, "SERVER_OK"));
+            sendMsg(new MsgTcp(TypeMsgTCP.REPLY_SERVER, "hello", List.of("SERVER_OK")));
             close();
             return;
         }
 
-        String []args = operation.split(",");
-
-        switch(args[0]){
-            case "login" ->
-                    sendMsg(
-                            new MsgTcp(
-                                    TypeMsgTCP.REPLY_SERVER,
-                                    connDB.verifyLogin(args[1], args[2]).toString()
-                            )
-                    );
-            case "register" -> {
-                String msgToSend;
-                if(!connDB.verifyUserExists(args[1], args[2])) {
-
-                    connDB.insertUser(args[1], args[2], args[3]);
-                    msgToSend = String.valueOf(connDB.getUserInformation(args[1]) != null);
-
-                } else
-                    msgToSend = "false";
-
+        switch(operation){
+            case "login" -> {
+                LoginStatus ls = LoginStatus.WRONG_CREDENTIALS;
+                if (msg.getMsg().get(0) instanceof String username
+                        && msg.getMsg().get(1) instanceof String password) {
+                    ls = connDB.verifyLogin(username, password);
+                }
                 sendMsg(
                         new MsgTcp(
                                 TypeMsgTCP.REPLY_SERVER,
-                                msgToSend
-                        )
+                                "login",
+                                List.of(ls, msg.getMsg().get(0))
+                                )
                 );
+            }
+            case "register" -> {
+
+                boolean insertUser = false;
+
+                if (msg.getMsg().get(0) instanceof String username
+                        && msg.getMsg().get(1) instanceof String nome
+                        && msg.getMsg().get(2) instanceof String password) {
+
+                    if (!connDB.verifyUserExists(username, nome))
+                        insertUser = connDB.insertUser(username, nome, password);
+
+                    sendMsg(
+                            new MsgTcp(
+                                    TypeMsgTCP.REPLY_SERVER,
+                                    "register",
+                                    List.of(insertUser)
+                            )
+                    );
+                }
             }
         }
     }
