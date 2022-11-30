@@ -23,8 +23,8 @@ public interface IClientState {
 
     //MINHAS_RESERVAS
     void pagarReserva(int id);
-    boolean eliminarReservaNaoPaga(int id);
-    String mostrarReservas(boolean reservaPaga);
+    void eliminarReservaNaoPaga(int id);
+    void mostrarReservas(boolean reservaPaga);
     boolean voltarPesquisaEspetaculos();
 
     //SELECIONA_ESPETACULO

@@ -87,14 +87,11 @@ abstract class ClientAdapter implements IClientState{
     public void pagarReserva(int id) { return;}
 
     @Override
-    public boolean eliminarReservaNaoPaga(int id) {
-        return false;
+    public void eliminarReservaNaoPaga(int id) {
     }
 
     @Override
-    public String mostrarReservas(boolean reservaPaga) {
-        return null;
-    }
+    public void mostrarReservas(boolean reservaPaga) { return;}
 
     @Override
     public boolean voltarPesquisaEspetaculos() {

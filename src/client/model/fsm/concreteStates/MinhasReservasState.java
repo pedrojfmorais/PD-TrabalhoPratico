@@ -19,7 +19,7 @@ public class MinhasReservasState extends ClientAdapter{
         try {
 
             data.getTcpConnection().sendMsg(
-                    new MsgTcp(TypeMsgTCP.CLIENT, "pagarReserva", List.of(id))
+                    new MsgTcp(TypeMsgTCP.CLIENT, "pagar reserva", List.of(id))
             );
         } catch (IOException | ClassNotFoundException e) {
             throw new RuntimeException(e);
@@ -27,18 +27,32 @@ public class MinhasReservasState extends ClientAdapter{
     }
 
     @Override
-    public boolean eliminarReservaNaoPaga(int id) {
-        return super.eliminarReservaNaoPaga(id);
+    public void eliminarReservaNaoPaga(int id) {
+        try {
+
+            data.getTcpConnection().sendMsg(
+                    new MsgTcp(TypeMsgTCP.CLIENT, "eliminar reserva", List.of(id))
+            );
+        } catch (IOException | ClassNotFoundException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
-    public String mostrarReservas(boolean reservaPaga) {
-        return super.mostrarReservas(reservaPaga);
+    public void mostrarReservas(boolean reservaPaga) {
+        try {
+
+            data.getTcpConnection().sendMsg(
+                    new MsgTcp(TypeMsgTCP.CLIENT, "mostrar reservas", null)
+            );
+        } catch (IOException | ClassNotFoundException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
     public boolean voltarPesquisaEspetaculos() {
-        return super.voltarPesquisaEspetaculos();
+        return super.voltarPesquisaEspetaculos(); // Muda de estado
     }
 
     @Override
