@@ -43,7 +43,7 @@ public class MinhasReservasState extends ClientAdapter{
         try {
 
             data.getTcpConnection().sendMsg(
-                    new MsgTcp(TypeMsgTCP.CLIENT, "mostrar reservas", null)
+                    new MsgTcp(TypeMsgTCP.CLIENT, "mostrar reservas", List.of(reservaPaga))
             );
         } catch (IOException | ClassNotFoundException e) {
             throw new RuntimeException(e);
@@ -52,7 +52,8 @@ public class MinhasReservasState extends ClientAdapter{
 
     @Override
     public boolean voltarPesquisaEspetaculos() {
-        return super.voltarPesquisaEspetaculos(); // Muda de estado
+        changeState(ClientState.CONSULTA_PESQUISA_ESPETACULOS);
+        return true;
     }
 
     @Override

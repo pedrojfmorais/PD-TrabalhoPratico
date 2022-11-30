@@ -4,7 +4,6 @@ import client.model.Client;
 import client.model.fsm.ClientContext;
 import client.model.fsm.ClientState;
 import client.model.fsm.IClientState;
-import server.model.data.LoginStatus;
 
 import java.io.IOException;
 
@@ -18,59 +17,37 @@ abstract class ClientAdapter implements IClientState{
         this.data = data;
     }
 
-    private boolean isAdminUser() {
-        return data.getUser().getStatus() == LoginStatus.SUCCESSFUL_ADMIN_USER;
-    }
-
     void changeState(ClientState state){context.changeState(state.createState(context, data));}
 
     @Override
-    public boolean tryConnectToServer() throws IOException, ClassNotFoundException {
-        return false;
-    }
+    public boolean tryConnectToServer() throws IOException, ClassNotFoundException { return false; }
 
     @Override
-    public void login(String username, String password) {
-    }
+    public void login(String username, String password) { }
 
     @Override
-    public void register(String username, String nome, String password) {
-    }
+    public void register(String username, String nome, String password) { }
 
     @Override
-    public boolean inserirEspetaculo(String filename) {
-        if(isAdminUser())
-            return false;
-        return true;
-    }
+    public boolean inserirEspetaculo(String filename) { return false; }
 
     @Override
-    public boolean eliminarEspetaculo(int id) {
-        if(isAdminUser())
-            return false;
-        return false;
-    }
+    public boolean eliminarEspetaculo(int id) { return false; }
 
     @Override
-    public boolean editarEstadoEspetaculo(int id) {
-        if(isAdminUser())
-            return false;
-        return false;
-    }
+    public boolean editarEstadoEspetaculo(int id) { return false; }
 
     @Override
-    public String pesquisarEspetaculo(String filtro) {
+    public void pesquisarEspetaculo(String filtro) {
         return null;
     }
 
     @Override
-    public boolean editarDadosUtilizador(String... dados) {
-        return false;
+    public void editarDadosUtilizador(String... dados) {
     }
 
     @Override
-    public boolean selecionarEspetaculo(int id) {
-        return false;
+    public void selecionarEspetaculo(int id) {
     }
 
     @Override
@@ -84,14 +61,13 @@ abstract class ClientAdapter implements IClientState{
     }
 
     @Override
-    public void pagarReserva(int id) { return;}
+    public void pagarReserva(int id) { }
 
     @Override
-    public void eliminarReservaNaoPaga(int id) {
-    }
+    public void eliminarReservaNaoPaga(int id) { }
 
     @Override
-    public void mostrarReservas(boolean reservaPaga) { return;}
+    public void mostrarReservas(boolean reservaPaga) { }
 
     @Override
     public boolean voltarPesquisaEspetaculos() {
@@ -104,9 +80,7 @@ abstract class ClientAdapter implements IClientState{
     }
 
     @Override
-    public void selecionaLugaresPretendidos(String... lugares) {
-
-    }
+    public void selecionaLugaresPretendidos(String... lugares) { }
 
     @Override
     public boolean validarReserva() {

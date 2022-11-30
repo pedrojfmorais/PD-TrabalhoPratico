@@ -15,9 +15,9 @@ public interface IClientState {
     boolean inserirEspetaculo(String filename);
     boolean eliminarEspetaculo(int id);
     boolean editarEstadoEspetaculo(int id);
-    String pesquisarEspetaculo(String filtro);
-    boolean editarDadosUtilizador(String ... dados);
-    boolean selecionarEspetaculo(int id);
+    void pesquisarEspetaculo(String filtro);
+    void editarDadosUtilizador(String ... dados);
+    void selecionarEspetaculo(int id);
     boolean minhasReservas();
     boolean logout();
 
