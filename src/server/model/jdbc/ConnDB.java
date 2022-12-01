@@ -7,6 +7,8 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Date;
 import java.util.List;
 
 public class ConnDB
@@ -271,6 +273,154 @@ public class ConnDB
 
         return espetaculos;
     }
+
+    public Espetaculo getEspetaculo(int id) throws SQLException {
+
+        Espetaculo espetaculo = null;
+
+        Statement statement = dbConn.createStatement();
+
+        String sqlQuery = "SELECT * FROM espetaculo WHERE id='" + id + "'";
+        ResultSet resultSet = statement.executeQuery(sqlQuery);
+
+        while(resultSet.next())
+        {
+            String sqlQueryLugares = "SELECT lugar.id, lugar.fila, lugar.assento, lugar.preco FROM lugar INNER JOIN espetaculo ON lugar.espetaculo_id=espetaculo.id WHERE espetaculo.id='" + resultSet.getInt("id") + "'";
+            ResultSet resultSetLugares = statement.executeQuery(sqlQueryLugares);
+
+            List<Lugar> lugares = new ArrayList<>();
+
+            while(resultSetLugares.next()) {
+                Lugar lugar = new Lugar(
+                        resultSetLugares.getInt("id"),
+                        resultSetLugares.getString("fila"),
+                        resultSetLugares.getString("assento"),
+                        resultSetLugares.getDouble("preco")
+                );
+                lugares.add(lugar);
+            }
+
+            espetaculo = new Espetaculo(
+                    resultSet.getInt("id"),
+                    resultSet.getInt("visivel") == 1,
+                    resultSet.getString("descricao"),
+                    resultSet.getString("tipo"),
+                    resultSet.getString("data_hora"),
+                    resultSet.getString("data_hora"),
+                    resultSet.getInt("duracao"),
+                    resultSet.getString("local"),
+                    resultSet.getString("localidade"),
+                    resultSet.getString("pais"),
+                    resultSet.getString("classificacao_etaria"),
+                    lugares
+            );
+        }
+
+        resultSet.close();
+        statement.close();
+
+        return espetaculo;
+    }
+
+    public boolean verifyReservaExists(int id) throws SQLException {
+        boolean res = false;
+        Statement statement = dbConn.createStatement();
+
+        String sqlQuery = "SELECT * FROM reserva WHERE id='" + id + "'";
+
+        ResultSet resultSet = statement.executeQuery(sqlQuery);
+
+        while(resultSet.next())
+            res = true;
+
+        resultSet.close();
+        statement.close();
+
+        return res;
+    }
+
+    public boolean pagarReserva(int id) throws SQLException {
+        Statement statement = dbConn.createStatement();
+
+        String sqlQuery = "UPDATE reserva SET pago='" + 1 + "' WHERE id=" + id;
+        statement.executeUpdate(sqlQuery);
+        statement.close();
+
+        incrementDBVersion();
+
+        return true;
+    }
+
+    public boolean eliminarReserva(int id) throws SQLException {
+        Statement statement = dbConn.createStatement();
+
+        String sqlQuery = "SELECT pago FROM reserva WHERE id=" + id;
+        statement.executeQuery(sqlQuery);
+
+        ResultSet resultSet = statement.executeQuery(sqlQuery);
+
+        while(resultSet.next())
+        {
+            if(resultSet.getInt("pago") == 1) // Reserva paga
+                return false;
+        }
+        sqlQuery = "DELETE * FROM reserva WHERE id='" + id + "'";
+        statement.executeUpdate(sqlQuery);
+
+        statement.close();
+        incrementDBVersion();
+
+        return true;
+    }
+
+    public List<Reserva> getReservas(boolean pago) throws SQLException {
+
+        List<Reserva> reservas = new ArrayList<>();
+        Reserva reserva = null;
+        Statement statement = dbConn.createStatement();
+
+        String sqlQuery = "SELECT * FROM reserva WHERE pago=" + pago;
+        statement.executeQuery(sqlQuery);
+
+        ResultSet resultSet = statement.executeQuery(sqlQuery);
+
+        while(resultSet.next()) {
+            String sqlQueryUsername = "SELECT utilizador.username FROM utilizador INNER JOIN reserva ON reserva.id_utilizador=utilizador.id WHERE reserva.id='" + resultSet.getInt("id") + "'";
+            ResultSet resultSetUsername = statement.executeQuery(sqlQueryUsername);
+
+            String sqlQueryEspetaculo = "SELECT * FROM espetaculo INNER JOIN reserva ON reserva.id_espetaculo=espetaculo.id WHERE reserva.id='" + resultSet.getInt("id") + "'";
+            ResultSet resultSetEspetaculo = statement.executeQuery(sqlQueryEspetaculo);
+
+            Espetaculo espetaculo = getEspetaculo(resultSetEspetaculo.getInt("id"));
+
+            String sqlQueryLugares = "SELECT lugar.id, lugar.fila, lugar.assento, lugar.preco FROM lugar INNER JOIN reserva_lugar ON lugar.reserva_id=reserva_lugar.reserva_id WHERE lugar.reserva_id='" + resultSet.getInt("id") + "'";
+            ResultSet resultSetLugares = statement.executeQuery(sqlQueryLugares);
+
+            List<Lugar> lugares = new ArrayList<>();
+
+            while(resultSetLugares.next()) {
+                Lugar lugar = new Lugar(
+                        resultSetLugares.getInt("id"),
+                        resultSetLugares.getString("fila"),
+                        resultSetLugares.getString("assento"),
+                        resultSetLugares.getDouble("preco")
+                );
+                lugares.add(lugar);
+            }
+
+            reserva = new Reserva(
+                    resultSet.getInt("id"),
+                    resultSetUsername.getString("username"),
+                    espetaculo,
+                    lugares,
+                    resultSet.getBoolean("pago"),
+                    new Date()
+            );
+            reservas.add(reserva);
+        }
+        return reservas;
+    }
+
 /*
     public void listUsers(String whereName) throws SQLException
     {

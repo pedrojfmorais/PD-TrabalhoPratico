@@ -1,9 +1,6 @@
 package server.communication;
 
-import server.model.data.Espetaculo;
-import server.model.data.LoginStatus;
-import server.model.data.MsgTcp;
-import server.model.data.TypeMsgTCP;
+import server.model.data.*;
 import server.model.jdbc.ConnDB;
 
 import java.io.IOException;
@@ -117,7 +114,7 @@ public class ThreadReceiveTCPMsg extends Thread{
             case "eliminar espetaculo" -> {
                 boolean result = false;
                 int id = (int) msg.getMsg().get(0);
-                if(!connDB.verifyEspetaculoExists(id))
+                if(connDB.verifyEspetaculoExists(id))
                     result = connDB.eliminarEspetaculo(id);
 
                 sendMsg(
@@ -131,7 +128,7 @@ public class ThreadReceiveTCPMsg extends Thread{
             case "editar espetaculo" -> {
                 boolean result = false;
                 int id = (int) msg.getMsg().get(0);
-                if(!connDB.verifyEspetaculoExists(id))
+                if(connDB.verifyEspetaculoExists(id))
                     result = connDB.editarEspetaculo(id);
 
                 sendMsg(
@@ -158,6 +155,48 @@ public class ThreadReceiveTCPMsg extends Thread{
                             )
                     );
                 }
+            }
+            case "pagar reserva" -> {
+                boolean result = false;
+                int id = (int) msg.getMsg().get(0);
+                if(connDB.verifyReservaExists(id))
+                    result = connDB.pagarReserva(id);
+
+                    sendMsg(
+                            new MsgTcp(
+                                    TypeMsgTCP.REPLY_SERVER,
+                                    "pagar reserva",
+                                    List.of(result)
+                            )
+                    );
+
+            }
+            case "eliminar reserva" -> {
+                boolean result = false;
+                int id = (int) msg.getMsg().get(0);
+                if(connDB.verifyReservaExists(id))
+                    result = connDB.eliminarReserva(id);
+
+                sendMsg(
+                        new MsgTcp(
+                                TypeMsgTCP.REPLY_SERVER,
+                                "eliminar reserva",
+                                List.of(result)
+                        )
+                );
+            }
+            case "mostrar reservas" -> {
+                boolean reservaPaga = (boolean) msg.getMsg().get(0);
+
+                List<Reserva> reservas = new ArrayList<>(connDB.getReservas(reservaPaga));
+
+                sendMsg(
+                        new MsgTcp(
+                                TypeMsgTCP.REPLY_SERVER,
+                                "mostrar reservas",
+                                List.of(reservas)
+                        )
+                );
             }
         }
     }
