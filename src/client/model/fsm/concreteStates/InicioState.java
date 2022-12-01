@@ -4,6 +4,7 @@ import client.model.Client;
 import client.model.fsm.ClientContext;
 import client.model.fsm.ClientState;
 import server.model.data.LoginStatus;
+import server.model.data.MessagesTCPOperation;
 import server.model.data.MsgTcp;
 import server.model.data.TypeMsgTCP;
 
@@ -23,7 +24,11 @@ public class InicioState extends ClientAdapter {
         try {
 
             data.getTcpConnection().sendMsg(
-                    new MsgTcp(TypeMsgTCP.CLIENT, "login", List.of(username, password))
+                    new MsgTcp(
+                            TypeMsgTCP.CLIENT,
+                            MessagesTCPOperation.CLIENT_SERVER_LOGIN,
+                            List.of(username, password)
+                    )
             );
         } catch (IOException | ClassNotFoundException e) {
             throw new RuntimeException(e);
@@ -35,7 +40,8 @@ public class InicioState extends ClientAdapter {
         try {
             data.getTcpConnection().sendMsg(new MsgTcp(
                     TypeMsgTCP.CLIENT,
-                    "register", List.of(username, nome, password))
+                    MessagesTCPOperation.CLIENT_SERVER_REGISTER,
+                    List.of(username, nome, password))
             );
         } catch (IOException | ClassNotFoundException e) {
             throw new RuntimeException(e);

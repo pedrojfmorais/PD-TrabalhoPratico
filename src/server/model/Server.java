@@ -1,10 +1,7 @@
 package server.model;
 
-import server.communication.ThreadReceiveNewTCPConnection;
+import server.communication.*;
 import server.ThreadRemoveOldServers;
-import server.communication.ThreadReceiveMulticast;
-import server.communication.ThreadReceiveUDPClients;
-import server.communication.ThreadSendHeartbeat;
 import server.model.data.Constants;
 import server.model.data.Heartbeat;
 import server.model.jdbc.ConnDB;
@@ -13,6 +10,8 @@ import java.io.File;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 public class Server {
@@ -31,6 +30,7 @@ public class Server {
         this.BD_FILE = db_path;
         try {
             connDB = new ConnDB(db_path);
+            localDbVersion = connDB.getVersionDB();
         } catch (SQLException e) {
             connDB = null;
         }
@@ -41,11 +41,22 @@ public class Server {
     }
 
     public void start() throws InterruptedException {
-        try {
-            connDB.createDB();
-        } catch (SQLException | IOException e) {
-            throw new RuntimeException(e);
-        }
+//        List<List<List<String>>> records;
+//        try {
+//            records = connDB.exportDB();
+//        } catch (SQLException e) {
+//            throw new RuntimeException(e);
+//        }
+//        System.out.println("ACABOU Export!");
+//        Thread.sleep(60 * 1000);
+//        System.out.println("Comecou import!");
+//        try {
+//            System.out.println(connDB.importDB(records));
+//        } catch (SQLException e) {
+//            throw new RuntimeException(e);
+//        }
+//        System.out.println("ACABOU Import!");
+
         ThreadReceiveMulticast trm = new ThreadReceiveMulticast(listaServidores);
         trm.start();
 
@@ -70,10 +81,17 @@ public class Server {
                 e.printStackTrace();
             }
         }
-        else if(desatualizado)
-            //TODO: estabelece conexão TCP e atualiza base de dados
-            System.out.println("Estabelece conexão TCP e atualiza base de dados");
-
+        else if(desatualizado) {
+            System.out.println("Atualizar TCP");
+            UpdateDatabaseOnStartup udos = new UpdateDatabaseOnStartup(listaServidores, connDB);
+            try {
+                if(!udos.updateDatabase())
+                    throw new IOException();
+            } catch (IOException | SQLException e) {
+                System.out.println("Erro a estabelecer conexão TCP ou a atualizar a base de dados");
+                throw new RuntimeException(e);
+            }
+        }
 
         //Quando tudo estiver ok
         serverData.setDISPONIVEL(true);

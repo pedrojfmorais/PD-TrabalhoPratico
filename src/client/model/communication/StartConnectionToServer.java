@@ -1,5 +1,6 @@
 package client.model.communication;
 
+import server.model.data.MessagesTCPOperation;
 import server.model.data.MsgTcp;
 import server.model.data.ServerTCPConnection;
 import server.model.data.TypeMsgTCP;
@@ -56,7 +57,7 @@ public final class StartConnectionToServer {
         ObjectOutputStream oos = new ObjectOutputStream(cliSocket.getOutputStream());
         ObjectInputStream ois = new ObjectInputStream(cliSocket.getInputStream());
 
-        oos.writeUnshared(new MsgTcp(TypeMsgTCP.CLIENT, "hello", null));
+        oos.writeUnshared(new MsgTcp(TypeMsgTCP.CLIENT, MessagesTCPOperation.CLIENT_SERVER_HELLO, null));
 
         MsgTcp msgRec = (MsgTcp) ois.readObject();
 

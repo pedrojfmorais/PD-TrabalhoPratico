@@ -55,7 +55,7 @@ public class ThreadTCPWithServer extends Thread{
             return;
 
         switch (msg.getOperation()){
-            case "login" -> {
+            case CLIENT_SERVER_LOGIN -> {
                 if(msg.getMsg().size() == 2 && msg.getMsg().get(0) instanceof LoginStatus ls){
                     if(ls == LoginStatus.WRONG_CREDENTIALS) {
                         fsm.getData().getUser().setStatus(LoginStatus.WRONG_CREDENTIALS);
@@ -73,7 +73,7 @@ public class ThreadTCPWithServer extends Thread{
                 }else
                     ClientUI.showMessage("Erro na comunicação com o servidor!", false);
             }
-            case "register" -> {
+            case CLIENT_SERVER_REGISTER -> {
                 if(msg.getMsg().get(0) instanceof Boolean b && b)
                     ClientUI.showMessage("Utilizador inserido com sucesso", false);
                 else

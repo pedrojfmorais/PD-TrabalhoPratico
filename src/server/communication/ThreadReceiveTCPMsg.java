@@ -1,6 +1,7 @@
 package server.communication;
 
 import server.model.data.LoginStatus;
+import server.model.data.MessagesTCPOperation;
 import server.model.data.MsgTcp;
 import server.model.data.TypeMsgTCP;
 import server.model.jdbc.ConnDB;
@@ -65,21 +66,30 @@ public class ThreadReceiveTCPMsg extends Thread{
     public void tratarMensagem(MsgTcp msg) throws SQLException, IOException {
         switch (msg.getMSG_TYPE()){
             case CLIENT  -> tratarMensagemCliente(msg);
-            case CREATE_DB_COPY -> {}//TODO:
+            case CREATE_DB_COPY -> {
+                sendMsg(new MsgTcp(
+                        TypeMsgTCP.CREATE_DB_COPY,
+                        MessagesTCPOperation.CREATE_DB_COPY_RESPOSTA,
+                        new ArrayList<>(connDB.exportDB())
+                ));
+            }
             default -> new MsgTcp(TypeMsgTCP.REPLY_SERVER, null, null);
         }
     }
 
     public void tratarMensagemCliente(MsgTcp msg) throws SQLException, IOException {
-        String operation = msg.getOperation();
-        if(operation.equals("hello")) {
-            sendMsg(new MsgTcp(TypeMsgTCP.REPLY_SERVER, "hello", List.of("SERVER_OK")));
+        MessagesTCPOperation operation = msg.getOperation();
+        if(operation == MessagesTCPOperation.CLIENT_SERVER_HELLO) {
+            sendMsg(new MsgTcp(
+                    TypeMsgTCP.REPLY_SERVER,
+                    MessagesTCPOperation.CLIENT_SERVER_HELLO,
+                    List.of("SERVER_OK")));
             close();
             return;
         }
 
         switch(operation){
-            case "login" -> {
+            case CLIENT_SERVER_LOGIN -> {
                 LoginStatus ls = LoginStatus.WRONG_CREDENTIALS;
                 if (msg.getMsg().get(0) instanceof String username
                         && msg.getMsg().get(1) instanceof String password) {
@@ -88,12 +98,12 @@ public class ThreadReceiveTCPMsg extends Thread{
                 sendMsg(
                         new MsgTcp(
                                 TypeMsgTCP.REPLY_SERVER,
-                                "login",
+                                MessagesTCPOperation.CLIENT_SERVER_LOGIN,
                                 List.of(ls, msg.getMsg().get(0))
                                 )
                 );
             }
-            case "register" -> {
+            case CLIENT_SERVER_REGISTER -> {
 
                 boolean insertUser = false;
 
@@ -107,7 +117,7 @@ public class ThreadReceiveTCPMsg extends Thread{
                     sendMsg(
                             new MsgTcp(
                                     TypeMsgTCP.REPLY_SERVER,
-                                    "register",
+                                    MessagesTCPOperation.CLIENT_SERVER_REGISTER,
                                     List.of(insertUser)
                             )
                     );
