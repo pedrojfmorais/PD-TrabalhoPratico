@@ -20,7 +20,7 @@ abstract class ClientAdapter implements IClientState{
     void changeState(ClientState state){context.changeState(state.createState(context, data));}
 
     @Override
-    public boolean tryConnectToServer() throws IOException, ClassNotFoundException { return false; }
+    public boolean tryConnectToServer(boolean changeState) throws IOException, ClassNotFoundException { return false; }
 
     @Override
     public void login(String username, String password) { }

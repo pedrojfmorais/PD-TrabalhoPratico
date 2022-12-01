@@ -8,6 +8,7 @@ import server.model.jdbc.ConnDB;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.Socket;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -23,6 +24,7 @@ public class Server {
     private ArrayList<Thread> allThreads;
     private Heartbeat serverData;
     private List<Heartbeat> listaServidores;
+    private List<ThreadReceiveTCPMsg> listaClientes;
 
     public Server(int udp_port, String db_path){
 
@@ -37,6 +39,7 @@ public class Server {
 
         allThreads = new ArrayList<>();
         listaServidores = new ArrayList<>();
+        listaClientes = new ArrayList<>();
         serverData = new Heartbeat(myTCPPort, false, localDbVersion,0);
     }
 
@@ -82,7 +85,6 @@ public class Server {
             }
         }
         else if(desatualizado) {
-            System.out.println("Atualizar TCP");
             UpdateDatabaseOnStartup udos = new UpdateDatabaseOnStartup(listaServidores, connDB);
             try {
                 if(!udos.updateDatabase())
@@ -118,7 +120,7 @@ public class Server {
     public void startThreads(){
 
 
-        ThreadReceiveNewTCPConnection trtcpc = new ThreadReceiveNewTCPConnection(serverData, connDB);
+        ThreadReceiveNewTCPConnection trtcpc = new ThreadReceiveNewTCPConnection(serverData, listaClientes, connDB);
         trtcpc.start();
 
         allThreads.add(trtcpc);
@@ -137,5 +139,12 @@ public class Server {
         trupdc.start();
 
         allThreads.add(trupdc);
+
+        ThreadVerificaVersaoDB tvvdb = new ThreadVerificaVersaoDB(
+                connDB, listaClientes, listaServidores, serverData, tsh
+        );
+        tvvdb.start();
+
+        allThreads.add(tvvdb);
     }
 }

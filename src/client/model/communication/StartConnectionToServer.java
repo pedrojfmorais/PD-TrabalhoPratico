@@ -50,7 +50,12 @@ public final class StartConnectionToServer {
 
     public static boolean testTCPServer(ServerTCPConnection server) throws IOException, ClassNotFoundException {
 
-        Socket cliSocket = new Socket(server.getIP(), server.getPORT());
+        Socket cliSocket = null;
+        try {
+            cliSocket = new Socket(server.getIP(), server.getPORT());
+        } catch (IOException e) {
+            return false;
+        }
 
         cliSocket.setSoTimeout(TIMEOUT_WAIT_TCP_CONFIRMATION);
 

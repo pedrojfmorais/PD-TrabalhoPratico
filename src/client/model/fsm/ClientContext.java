@@ -2,7 +2,6 @@ package client.model.fsm;
 
 import client.model.Client;
 
-import java.beans.PropertyChangeSupport;
 import java.io.IOException;
 
 public class ClientContext {
@@ -28,7 +27,7 @@ public class ClientContext {
     }
 
     public boolean tryConnectToServer() throws IOException, ClassNotFoundException {
-        return state.tryConnectToServer();
+        return state.tryConnectToServer(true);
     }
 
     public void login(String username, String password){

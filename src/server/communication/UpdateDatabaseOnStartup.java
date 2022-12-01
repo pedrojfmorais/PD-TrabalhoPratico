@@ -27,7 +27,7 @@ public class UpdateDatabaseOnStartup{
     }
 
     public boolean updateDatabase() throws IOException, SQLException {
-        sortListaServidores();
+        sortListaServidores(listaServidores);
         for (var server : listaServidores)
             if(establishConnectionTCP(server.getIpServer(), server.getTCP_PORT()))
                 return true;
@@ -57,7 +57,7 @@ public class UpdateDatabaseOnStartup{
         }
 
         if(msgRec.getMSG_TYPE() == TypeMsgTCP.CREATE_DB_COPY
-                && msgRec.getOperation().equals("resposta")){
+                && msgRec.getOperation().equals(MessagesTCPOperation.CREATE_DB_COPY_RESPOSTA)){
 
             List<List<List<String>>> records = new ArrayList<>();
 
@@ -71,7 +71,7 @@ public class UpdateDatabaseOnStartup{
         return false;
     }
 
-    private void sortListaServidores(){
+    public static void sortListaServidores(List<Heartbeat> listaServidores){
         listaServidores.sort(new Comparator<Heartbeat>() {
             @Override
             public int compare(Heartbeat o1, Heartbeat o2) {

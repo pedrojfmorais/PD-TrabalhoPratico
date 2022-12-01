@@ -1,19 +1,19 @@
 package client.model.communication;
 
-import client.model.Client;
 import client.model.fsm.ClientContext;
 import client.model.fsm.ClientState;
-import client.model.fsm.concreteStates.InicioState;
+import client.model.fsm.concreteStates.NoServerConnectedState;
 import client.ui.text.ClientUI;
-import server.model.data.LoginStatus;
-import server.model.data.MsgTcp;
+import server.model.data.*;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.net.SocketException;
-import java.sql.SQLException;
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class ThreadTCPWithServer extends Thread{
 
@@ -21,11 +21,14 @@ public class ThreadTCPWithServer extends Thread{
     Socket serverSocket;
     ObjectOutputStream oos;
     ObjectInputStream ois;
+    List<ServerTCPConnection> listaServidores;
 
-    public ThreadTCPWithServer(ClientContext fsm, Socket serverSocket) throws IOException {
+    public ThreadTCPWithServer(ClientContext fsm, Socket serverSocket,
+                               List<ServerTCPConnection> listaServidores) throws IOException {
 
         this.fsm = fsm;
         this.serverSocket = serverSocket;
+        this.listaServidores = listaServidores;
 
         this.oos = new ObjectOutputStream(serverSocket.getOutputStream());
         this.ois = new ObjectInputStream(serverSocket.getInputStream());
@@ -38,21 +41,43 @@ public class ThreadTCPWithServer extends Thread{
             MsgTcp msgRec = null;
             try {
                 msgRec = (MsgTcp) ois.readObject();
+                tratarMensagem(msgRec);
             } catch (SocketException e){
-                //TODO: acabou conexão
-                throw new RuntimeException(e);
+                try {
+                    new NoServerConnectedState(fsm, fsm.getData()).tryConnectToServer(false);
+                    close();
+                    break;
+                } catch (IOException | ClassNotFoundException ex) {
+                    throw new RuntimeException(ex);
+                }
+
             } catch (IOException | ClassNotFoundException e) {
                 throw new RuntimeException(e);
             }
 
-            tratarMensagem(msgRec);
         }while(true);
     }
 
-    public void tratarMensagem(MsgTcp msg){
+    public void tratarMensagem(MsgTcp msg) throws IOException, ClassNotFoundException {
 
-        if(msg.getOperation().equals("hello") && msg.getMsg().equals("SERVER_OK"))
+        if(msg.getOperation() == MessagesTCPOperation.CLIENT_SERVER_HELLO && msg.getMsg().equals("SERVER_OK"))
             return;
+
+        if(msg.getMSG_TYPE() == TypeMsgTCP.SERVER_ASYNC
+                && msg.getOperation() == MessagesTCPOperation.SERVER_ASYNC_RESET_CONNECTION){
+
+            listaServidores = msg.getMsg().stream()
+                    .map( object -> (ServerTCPConnection) object)
+                    .collect(Collectors.toList());
+
+            //TODO: remove
+            System.out.println(Arrays.toString(listaServidores.toArray()));
+
+//            new NoServerConnectedState(fsm, fsm.getData()).tryConnectToServer(false);
+
+            close();
+        }
+
 
         switch (msg.getOperation()){
             case CLIENT_SERVER_LOGIN -> {

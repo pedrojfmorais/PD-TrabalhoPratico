@@ -12,10 +12,10 @@ public class NoServerConnectedState extends ClientAdapter{
     }
 
     @Override
-    public boolean tryConnectToServer() throws IOException, ClassNotFoundException {
+    public boolean tryConnectToServer(boolean changeState) throws IOException, ClassNotFoundException {
         boolean res = data.tryConnectToServer();
 
-        if(res)
+        if(res && changeState)
             changeState(ClientState.INICIO);
 
         return res;

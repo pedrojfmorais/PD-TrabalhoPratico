@@ -3,12 +3,14 @@ package client.model;
 import client.model.communication.ThreadTCPWithServer;
 import client.model.data.User;
 import client.model.fsm.ClientContext;
+import client.ui.text.ClientUI;
 import server.model.data.LoginStatus;
 import server.model.data.ServerTCPConnection;
 
 import java.io.IOException;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.List;
 
 import static client.model.communication.StartConnectionToServer.getActiveServers;
 import static client.model.communication.StartConnectionToServer.testTCPServer;
@@ -18,6 +20,7 @@ public class Client {
     ClientContext fsm;
     private User user;
     ThreadTCPWithServer tcpConnection;
+    List<ServerTCPConnection> listaServidores;
     final String IP_SERVER;
     final int PORT_UDP;
 
@@ -26,6 +29,12 @@ public class Client {
         this.IP_SERVER = IP_SERVER;
         this.PORT_UDP = PORT_UDP;
         this.fsm = fsm;
+
+        try {
+            listaServidores = getActiveServers(IP_SERVER, PORT_UDP);
+        } catch (IOException | ClassNotFoundException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public User getUser() {
@@ -36,14 +45,16 @@ public class Client {
         return tcpConnection;
     }
 
-    public boolean tryConnectToServer() throws IOException, ClassNotFoundException {
+    public boolean tryConnectToServer() throws IOException {
         ServerTCPConnection serverTCPConnected = null;
-
-        ArrayList<ServerTCPConnection> listaServidoresAEnviar = getActiveServers(IP_SERVER, PORT_UDP);
-        for (var server : listaServidoresAEnviar) {
-            if(testTCPServer(server)){
-                serverTCPConnected = server;
-                break;
+        for (var server : listaServidores) {
+            try {
+                if(testTCPServer(server)){
+                    serverTCPConnected = server;
+                    break;
+                }
+            } catch (IOException | ClassNotFoundException e) {
+                throw new RuntimeException(e);
             }
         }
 
@@ -52,12 +63,14 @@ public class Client {
 
         tcpConnection = new ThreadTCPWithServer(
                 fsm,
-                new Socket(serverTCPConnected.getIP(), serverTCPConnected.getPORT())
+                new Socket(serverTCPConnected.getIP(), serverTCPConnected.getPORT()),
+                listaServidores
         );
         tcpConnection.start();
 
-        //TODO: debug
-        System.out.println(serverTCPConnected.getIP() + ":" + serverTCPConnected.getPORT());
+        ClientUI.showMessage(
+                "Conectado ao servidor " + serverTCPConnected.getIP() + ":" + serverTCPConnected.getPORT(),
+                true);
 
         return true;
     }

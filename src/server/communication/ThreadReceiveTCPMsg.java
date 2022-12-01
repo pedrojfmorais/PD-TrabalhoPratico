@@ -20,13 +20,15 @@ public class ThreadReceiveTCPMsg extends Thread{
 
     private ConnDB connDB;
     private Socket cliSocket;
+    private Heartbeat serverData;
     private ObjectOutputStream oos;
     private ObjectInputStream ois;
     private boolean threadContinue = true;
 
-    public ThreadReceiveTCPMsg(Socket cliSocket, ConnDB connDB) throws IOException {
+    public ThreadReceiveTCPMsg(Socket cliSocket, ConnDB connDB, Heartbeat serverData) throws IOException {
         this.cliSocket = cliSocket;
         this.connDB = connDB;
+        this.serverData = serverData;
 
         oos = new ObjectOutputStream(cliSocket.getOutputStream());
         ois = new ObjectInputStream(cliSocket.getInputStream());
@@ -48,6 +50,7 @@ public class ThreadReceiveTCPMsg extends Thread{
 
             try {
                 tratarMensagem(msgRec);
+                serverData.setLOCAL_DB_VERSION(connDB.getVersionDB());
             } catch (SQLException | IOException e) {
                 throw new RuntimeException(e);
             }

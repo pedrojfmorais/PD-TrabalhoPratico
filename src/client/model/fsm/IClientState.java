@@ -5,7 +5,7 @@ import java.io.IOException;
 public interface IClientState {
 
     //NO_SERVER_CONNECTED
-    boolean tryConnectToServer() throws IOException, ClassNotFoundException;
+    boolean tryConnectToServer(boolean changeState) throws IOException, ClassNotFoundException;
 
     //INICIO
     void login(String username, String password);
