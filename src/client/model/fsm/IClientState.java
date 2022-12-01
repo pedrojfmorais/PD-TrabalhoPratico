@@ -15,23 +15,23 @@ public interface IClientState {
     boolean inserirEspetaculo(String filename);
     boolean eliminarEspetaculo(int id);
     boolean editarEstadoEspetaculo(int id);
-    String pesquisarEspetaculo(String filtro);
-    boolean editarDadosUtilizador(String ... dados);
-    boolean selecionarEspetaculo(int id);
+    void pesquisarEspetaculo(String filtro);
+    void editarDadosUtilizador(String ... dados);
+    void selecionarEspetaculo(int id);
     boolean minhasReservas();
     boolean logout();
 
     //MINHAS_RESERVAS
-    boolean pagarReserva(int id);
-    boolean eliminarReservaNaoPaga(int id);
-    String mostrarReservas(boolean reservaPaga);
+    void pagarReserva(int id);
+    void eliminarReservaNaoPaga(int id);
+    void mostrarReservas(boolean reservaPaga);
     boolean voltarPesquisaEspetaculos();
 
     //SELECIONA_ESPETACULO
-    String mostraLugaresDisponiveis();
+    void mostraLugaresDisponiveis();
     void selecionaLugaresPretendidos(String ... lugares);
-    boolean validarReserva();
-    boolean cancelarReserva();
+    void validarReserva();
+    void cancelarReserva(int id);
 
     //Todos
     ClientState getState();
