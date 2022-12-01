@@ -224,6 +224,7 @@ public class ConnDB
     }
 
     // TODO (Dúvida): Guardar data e hora separadas na BD ?
+    // Consulta e pesquisa de espetáculos com base em diversos tipos de critérios/filtros (nome, localidade, género, data, etc.);
     public List<Espetaculo> pesquisarEspetaculo(String filtro) throws SQLException {
 
         Espetaculo espetaculo = null;
@@ -231,7 +232,7 @@ public class ConnDB
 
         Statement statement = dbConn.createStatement();
 
-        String sqlQuery = "SELECT * FROM espetaculo WHERE descricao='" + filtro + "'";
+        String sqlQuery = "SELECT * FROM espetaculo WHERE descricao='" + filtro + "'" + "OR localidade=''" + filtro + "'" + "OR tipo='" + filtro + "'" + "OR data_hora='" + filtro + "'";
         ResultSet resultSet = statement.executeQuery(sqlQuery);
 
         while(resultSet.next())
