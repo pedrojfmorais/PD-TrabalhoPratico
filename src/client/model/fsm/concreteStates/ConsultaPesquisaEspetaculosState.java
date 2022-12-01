@@ -119,7 +119,6 @@ public class ConsultaPesquisaEspetaculosState extends ClientAdapter {
         }
     }
 
-    // TODO (Dúvida): why is this here? que dados podem ser alterados?
     @Override
     public void editarDadosUtilizador(String... dados) {
         try {

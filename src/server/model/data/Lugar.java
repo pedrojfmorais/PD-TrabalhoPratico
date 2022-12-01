@@ -5,6 +5,7 @@ public class Lugar {
     String fila;
     String assento;
     double preco;
+    boolean disponivel = true;
 
     public Lugar(int id, String fila, String assento, double preco) {
         this.id = id;
