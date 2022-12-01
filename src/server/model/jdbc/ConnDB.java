@@ -197,12 +197,26 @@ public class ConnDB
         return res;
     }
 
-    // TODO: (Dúvida) Retorno ??
+    // O espetáculo apenas pode ser eliminado caso não existam reservas pagas.
+    // Se existirem reservas por pagar, são eliminadas
     public boolean eliminarEspetaculo(int id) throws SQLException {
-        boolean res = false;
         Statement statement = dbConn.createStatement();
 
-        String sqlQuery = "DELETE * FROM espetaculo WHERE id='" + id + "'";
+        // Verificar se existem reservas pagas para este espetáculo
+        String sqlQuery = "SELECT * FROM reserva WHERE id_espetaculo='" + id + "'";
+
+        ResultSet resultSet = statement.executeQuery(sqlQuery);
+
+        while(resultSet.next()) {
+            if(resultSet.getBoolean("pago"))
+                return false;
+            if(!resultSet.getBoolean("pago")) {
+                sqlQuery = "DELETE * FROM reserva WHERE id='" + resultSet.getInt("id") + "'";
+                statement.executeUpdate(sqlQuery);
+            }
+        }
+
+        sqlQuery = "DELETE * FROM espetaculo WHERE id='" + id + "'";
 
         statement.executeUpdate(sqlQuery);
         statement.close();
