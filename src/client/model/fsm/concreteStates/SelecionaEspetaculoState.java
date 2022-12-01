@@ -3,6 +3,7 @@ package client.model.fsm.concreteStates;
 import client.model.Client;
 import client.model.fsm.ClientContext;
 import client.model.fsm.ClientState;
+import server.model.data.MessagesTCPOperation;
 import server.model.data.MsgTcp;
 import server.model.data.TypeMsgTCP;
 
@@ -19,7 +20,10 @@ public class SelecionaEspetaculoState extends ClientAdapter {
         try {
 
             data.getTcpConnection().sendMsg(
-                    new MsgTcp(TypeMsgTCP.CLIENT, "mostra lugares", null)
+                    new MsgTcp(
+                            TypeMsgTCP.CLIENT,
+                            MessagesTCPOperation.CLIENT_SERVER_MOSTRA_LUGARES,
+                            null)
             );
         } catch (IOException | ClassNotFoundException e) {
             throw new RuntimeException(e);
@@ -31,7 +35,10 @@ public class SelecionaEspetaculoState extends ClientAdapter {
         try {
 
             data.getTcpConnection().sendMsg(
-                    new MsgTcp(TypeMsgTCP.CLIENT, "seleciona lugares", List.of(lugares))
+                    new MsgTcp(
+                            TypeMsgTCP.CLIENT,
+                            MessagesTCPOperation.CLIENT_SERVER_SELECIONA_LUGARES,
+                            List.of(lugares))
             );
         } catch (IOException | ClassNotFoundException e) {
             throw new RuntimeException(e);
@@ -42,7 +49,10 @@ public class SelecionaEspetaculoState extends ClientAdapter {
         try {
 
             data.getTcpConnection().sendMsg(
-                    new MsgTcp(TypeMsgTCP.CLIENT, "validar reserva", List.of(id))
+                    new MsgTcp(
+                            TypeMsgTCP.CLIENT,
+                            MessagesTCPOperation.CLIENT_SERVER_VALIDA_RESERVA,
+                            List.of(id))
             );
         } catch (IOException | ClassNotFoundException e) {
             throw new RuntimeException(e);
@@ -54,7 +64,10 @@ public class SelecionaEspetaculoState extends ClientAdapter {
         try {
 
             data.getTcpConnection().sendMsg(
-                    new MsgTcp(TypeMsgTCP.CLIENT, "cancelar reserva", List.of(id))
+                    new MsgTcp(
+                            TypeMsgTCP.CLIENT,
+                            MessagesTCPOperation.CLIENT_SERVER_CANCELAR_RESERVA,
+                            List.of(id))
             );
         } catch (IOException | ClassNotFoundException e) {
             throw new RuntimeException(e);

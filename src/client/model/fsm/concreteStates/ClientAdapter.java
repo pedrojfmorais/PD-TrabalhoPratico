@@ -39,7 +39,7 @@ abstract class ClientAdapter implements IClientState{
 
     @Override
     public void pesquisarEspetaculo(String filtro) {
-        return null;
+        return;
     }
 
     @Override
@@ -76,7 +76,7 @@ abstract class ClientAdapter implements IClientState{
 
     @Override
     public void mostraLugaresDisponiveis() {
-        return null;
+        return;
     }
 
     @Override

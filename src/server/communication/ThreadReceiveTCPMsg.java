@@ -124,7 +124,7 @@ public class ThreadReceiveTCPMsg extends Thread{
                     );
                 }
             }
-            case "eliminar espetaculo" -> {
+            case CLIENT_SERVER_ELIMINAR_ESPETACULO -> {
                 boolean result = false;
                 int id = (int) msg.getMsg().get(0);
                 if(connDB.verifyEspetaculoExists(id))
@@ -133,12 +133,12 @@ public class ThreadReceiveTCPMsg extends Thread{
                 sendMsg(
                         new MsgTcp(
                                 TypeMsgTCP.REPLY_SERVER,
-                                "eliminar espetaculo",
+                                MessagesTCPOperation.CLIENT_SERVER_ELIMINAR_ESPETACULO,
                                 List.of(result)
                         )
                 );
             }
-            case "editar espetaculo" -> {
+            case CLIENT_SERVER_EDITAR_ESPETACULO -> {
                 boolean result = false;
                 int id = (int) msg.getMsg().get(0);
                 if(connDB.verifyEspetaculoExists(id))
@@ -147,15 +147,15 @@ public class ThreadReceiveTCPMsg extends Thread{
                 sendMsg(
                         new MsgTcp(
                                 TypeMsgTCP.REPLY_SERVER,
-                                "editar espetaculo",
+                                MessagesTCPOperation.CLIENT_SERVER_EDITAR_ESPETACULO,
                                 List.of(result)
                         )
                 );
             }
-            case "selecionar espetaculo" -> {
+            case CLIENT_SERVER_SELECIONAR_ESPETACULO -> {
                 // TODO ???
             }
-            case "pesquisa espetaculo" -> {
+            case CLIENT_SERVER_PESQUISA_ESPETACULO -> {
                 if(msg.getMsg().get(0) instanceof String filtro) {
 
                     List<Espetaculo> espetaculos = new ArrayList<>(connDB.pesquisarEspetaculo(filtro));
@@ -163,28 +163,28 @@ public class ThreadReceiveTCPMsg extends Thread{
                     sendMsg(
                             new MsgTcp(
                                     TypeMsgTCP.REPLY_SERVER,
-                                    "pesquisa espetaculo",
+                                    MessagesTCPOperation.CLIENT_SERVER_PESQUISA_ESPETACULO,
                                     List.of(espetaculos)
                             )
                     );
                 }
             }
-            case "pagar reserva" -> {
+            case CLIENT_SERVER_PAGAR_RESERVA -> {
                 boolean result = false;
                 int id = (int) msg.getMsg().get(0);
                 if(connDB.verifyReservaExists(id))
                     result = connDB.pagarReserva(id);
 
-                    sendMsg(
-                            new MsgTcp(
-                                    TypeMsgTCP.REPLY_SERVER,
-                                    "pagar reserva",
-                                    List.of(result)
-                            )
-                    );
+                sendMsg(
+                        new MsgTcp(
+                                TypeMsgTCP.REPLY_SERVER,
+                                MessagesTCPOperation.CLIENT_SERVER_PAGAR_RESERVA,
+                                List.of(result)
+                        )
+                );
 
             }
-            case "eliminar reserva" -> {
+            case CLIENT_SERVER_ELIMINAR_RESERVA -> {
                 boolean result = false;
                 int id = (int) msg.getMsg().get(0);
                 if(connDB.verifyReservaExists(id))
@@ -193,12 +193,12 @@ public class ThreadReceiveTCPMsg extends Thread{
                 sendMsg(
                         new MsgTcp(
                                 TypeMsgTCP.REPLY_SERVER,
-                                "eliminar reserva",
+                                MessagesTCPOperation.CLIENT_SERVER_ELIMINAR_RESERVA,
                                 List.of(result)
                         )
                 );
             }
-            case "mostrar reservas" -> {
+            case CLIENT_SERVER_MOSTRAR_RESERVAS -> {
                 boolean reservaPaga = (boolean) msg.getMsg().get(0);
 
                 List<Reserva> reservas = new ArrayList<>(connDB.getReservas(reservaPaga));
@@ -206,7 +206,7 @@ public class ThreadReceiveTCPMsg extends Thread{
                 sendMsg(
                         new MsgTcp(
                                 TypeMsgTCP.REPLY_SERVER,
-                                "mostrar reservas",
+                                MessagesTCPOperation.CLIENT_SERVER_MOSTRAR_RESERVAS,
                                 List.of(reservas)
                         )
                 );

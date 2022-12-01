@@ -63,7 +63,10 @@ public class ConsultaPesquisaEspetaculosState extends ClientAdapter {
         try {
 
             data.getTcpConnection().sendMsg(
-                    new MsgTcp(TypeMsgTCP.CLIENT, "eliminar espetaculo", List.of(id))
+                    new MsgTcp(
+                            TypeMsgTCP.CLIENT,
+                            MessagesTCPOperation.CLIENT_SERVER_ELIMINAR_ESPETACULO,
+                            List.of(id))
             );
         } catch (IOException | ClassNotFoundException e) {
             throw new RuntimeException(e);
@@ -79,7 +82,10 @@ public class ConsultaPesquisaEspetaculosState extends ClientAdapter {
         try {
 
             data.getTcpConnection().sendMsg(
-                    new MsgTcp(TypeMsgTCP.CLIENT, "editar espetaculo", List.of(id))
+                    new MsgTcp(
+                            TypeMsgTCP.CLIENT,
+                            MessagesTCPOperation.CLIENT_SERVER_EDITAR_ESPETACULO,
+                            List.of(id))
             );
         } catch (IOException | ClassNotFoundException e) {
             throw new RuntimeException(e);
@@ -93,7 +99,10 @@ public class ConsultaPesquisaEspetaculosState extends ClientAdapter {
         try {
 
             data.getTcpConnection().sendMsg(
-                    new MsgTcp(TypeMsgTCP.CLIENT, "selecionar espetaculo", List.of(id))
+                    new MsgTcp(
+                            TypeMsgTCP.CLIENT,
+                            MessagesTCPOperation.CLIENT_SERVER_SELECIONAR_ESPETACULO,
+                            List.of(id))
             );
         } catch (IOException | ClassNotFoundException e) {
             throw new RuntimeException(e);
@@ -112,7 +121,10 @@ public class ConsultaPesquisaEspetaculosState extends ClientAdapter {
         try {
 
             data.getTcpConnection().sendMsg(
-                    new MsgTcp(TypeMsgTCP.CLIENT, "pesquisa espetaculo", List.of(filtro))
+                    new MsgTcp(
+                            TypeMsgTCP.CLIENT,
+                            MessagesTCPOperation.CLIENT_SERVER_PESQUISA_ESPETACULO,
+                            List.of(filtro))
             );
         } catch (IOException | ClassNotFoundException e) {
             throw new RuntimeException(e);
@@ -124,7 +136,10 @@ public class ConsultaPesquisaEspetaculosState extends ClientAdapter {
         try {
 
             data.getTcpConnection().sendMsg(
-                    new MsgTcp(TypeMsgTCP.CLIENT, "editar utilizador", List.of(dados))
+                    new MsgTcp(
+                            TypeMsgTCP.CLIENT,
+                            MessagesTCPOperation.CLIENT_SERVER_EDITAR_UTILIZADOR,
+                            List.of(dados))
             );
         } catch (IOException | ClassNotFoundException e) {
             throw new RuntimeException(e);

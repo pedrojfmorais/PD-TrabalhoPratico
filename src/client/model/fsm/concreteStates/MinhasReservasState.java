@@ -3,6 +3,7 @@ package client.model.fsm.concreteStates;
 import client.model.Client;
 import client.model.fsm.ClientContext;
 import client.model.fsm.ClientState;
+import server.model.data.MessagesTCPOperation;
 import server.model.data.MsgTcp;
 import server.model.data.TypeMsgTCP;
 
@@ -19,7 +20,10 @@ public class MinhasReservasState extends ClientAdapter{
         try {
 
             data.getTcpConnection().sendMsg(
-                    new MsgTcp(TypeMsgTCP.CLIENT, "pagar reserva", List.of(id))
+                    new MsgTcp(
+                            TypeMsgTCP.CLIENT,
+                            MessagesTCPOperation.CLIENT_SERVER_PAGAR_RESERVA,
+                            List.of(id))
             );
         } catch (IOException | ClassNotFoundException e) {
             throw new RuntimeException(e);
@@ -31,7 +35,10 @@ public class MinhasReservasState extends ClientAdapter{
         try {
 
             data.getTcpConnection().sendMsg(
-                    new MsgTcp(TypeMsgTCP.CLIENT, "eliminar reserva", List.of(id))
+                    new MsgTcp(
+                            TypeMsgTCP.CLIENT,
+                            MessagesTCPOperation.CLIENT_SERVER_ELIMINAR_RESERVA,
+                            List.of(id))
             );
         } catch (IOException | ClassNotFoundException e) {
             throw new RuntimeException(e);
@@ -43,7 +50,10 @@ public class MinhasReservasState extends ClientAdapter{
         try {
 
             data.getTcpConnection().sendMsg(
-                    new MsgTcp(TypeMsgTCP.CLIENT, "mostrar reservas", List.of(reservaPaga))
+                    new MsgTcp(
+                            TypeMsgTCP.CLIENT,
+                            MessagesTCPOperation.CLIENT_SERVER_MOSTRAR_RESERVAS,
+                            List.of(reservaPaga))
             );
         } catch (IOException | ClassNotFoundException e) {
             throw new RuntimeException(e);
