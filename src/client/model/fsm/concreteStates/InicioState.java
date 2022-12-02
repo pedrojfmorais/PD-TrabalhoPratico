@@ -20,7 +20,7 @@ public class InicioState extends ClientAdapter {
 
     @Override
     public void login(String username, String password) {
-        String result = null;
+        // String result = null;
         try {
 
             data.getTcpConnection().sendMsg(

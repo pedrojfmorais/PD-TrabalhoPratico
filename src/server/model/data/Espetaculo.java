@@ -4,19 +4,19 @@ import java.util.List;
 import java.util.Date;
 
 public class Espetaculo {
-    int id;
-    boolean visibilidade = false;
-    String designacao;
-    String tipo;
-    Date data;
+    private int id;
+    private boolean visibilidade = false;
+    private String designacao;
+    private String tipo;
+    private Date data;
     /*String data;
     String hora;*/
-    int duracao;
-    String local;
-    String localidade;
-    String pais;
-    String classificacao;
-    List<Lugar> lugares;
+    private int duracao;
+    private String local;
+    private String localidade;
+    private String pais;
+    private String classificacao;
+    private List<Lugar> lugares;
 
     public Espetaculo(int id, boolean visibilidade, String designacao, String tipo, Date data/*, String hora*/, int duracao, String local, String localidade, String pais, String classificacao, List<Lugar> lugares) {
         this.id = id;
