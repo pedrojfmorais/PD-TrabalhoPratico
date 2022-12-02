@@ -6,7 +6,6 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.net.*;
-import java.time.chrono.HijrahEra;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
@@ -24,8 +23,7 @@ public class ThreadReceiveMulticast extends Thread {
 
     @Override
     public void run() {
-        try {
-            MulticastSocket ms = new MulticastSocket(PORT_MULTICAST);
+        try (MulticastSocket ms = new MulticastSocket(PORT_MULTICAST)) {
 
             InetAddress address = InetAddress.getByName(IP_MULTICAST);
 
@@ -38,7 +36,7 @@ public class ThreadReceiveMulticast extends Thread {
             ms.joinGroup(sa, ni);
             */
 
-            while(true) {
+            while (true) {
                 DatagramPacket dpRec = new DatagramPacket(new byte[256], 0, 256);
 
                 ms.receive(dpRec);
@@ -48,7 +46,7 @@ public class ThreadReceiveMulticast extends Thread {
 
                 Object msg = ois.readObject();
 
-                if(msg instanceof Heartbeat h){
+                if (msg instanceof Heartbeat h) {
                     h.setIpServer(dpRec.getAddress().getHostAddress());
                     h.setReceivedAt(new Date());
                     recebeHeartBeat(h);
@@ -60,12 +58,12 @@ public class ThreadReceiveMulticast extends Thread {
         }
     }
 
-    void recebeHeartBeat(Heartbeat h){
+    void recebeHeartBeat(Heartbeat h) {
         synchronized (listaServidores) {
             // tenta remover a versão anterior deste servidor da lista de servidores, se ele já lá estiver
             listaServidores.remove(h);
 
-            if(h.isDISPONIVEL())
+            if (h.isDISPONIVEL())
                 listaServidores.add(h);
 
             Collections.sort(listaServidores);

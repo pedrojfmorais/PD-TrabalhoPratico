@@ -3,13 +3,11 @@ package client.model.fsm.concreteStates;
 import client.model.Client;
 import client.model.fsm.ClientContext;
 import client.model.fsm.ClientState;
-import server.model.data.LoginStatus;
 import server.model.data.MessagesTCPOperation;
 import server.model.data.MsgTcp;
 import server.model.data.TypeMsgTCP;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 
 public class InicioState extends ClientAdapter {

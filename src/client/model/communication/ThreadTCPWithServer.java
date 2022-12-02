@@ -11,13 +11,12 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.net.SocketException;
-import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
 public class ThreadTCPWithServer extends Thread{
 
-    ClientContext fsm;
+    final ClientContext fsm;
     Socket serverSocket;
     ObjectOutputStream oos;
     ObjectInputStream ois;
@@ -36,15 +35,16 @@ public class ThreadTCPWithServer extends Thread{
 
     @Override
     public void run() {
-
         do{
-            MsgTcp msgRec = null;
+            MsgTcp msgRec;
             try {
                 msgRec = (MsgTcp) ois.readObject();
                 tratarMensagem(msgRec);
             } catch (SocketException e){
                 try {
-                    new NoServerConnectedState(fsm, fsm.getData()).tryConnectToServer(false);
+                    synchronized (fsm) {
+                        new NoServerConnectedState(fsm, fsm.getData()).tryConnectToServer(false);
+                    }
                     close();
                     break;
                 } catch (IOException | ClassNotFoundException ex) {
@@ -60,7 +60,7 @@ public class ThreadTCPWithServer extends Thread{
 
     public void tratarMensagem(MsgTcp msg) throws IOException, ClassNotFoundException {
 
-        if(msg.getOperation() == MessagesTCPOperation.CLIENT_SERVER_HELLO && msg.getMsg().equals("SERVER_OK"))
+        if(msg.getOperation() == MessagesTCPOperation.CLIENT_SERVER_HELLO && msg.getMsg().get(0).equals("SERVER_OK"))
             return;
 
         if(msg.getMSG_TYPE() == TypeMsgTCP.SERVER_ASYNC
@@ -69,29 +69,25 @@ public class ThreadTCPWithServer extends Thread{
             listaServidores = msg.getMsg().stream()
                     .map( object -> (ServerTCPConnection) object)
                     .collect(Collectors.toList());
-
-            //TODO: remove
-            System.out.println(Arrays.toString(listaServidores.toArray()));
-
-//            new NoServerConnectedState(fsm, fsm.getData()).tryConnectToServer(false);
-
             close();
         }
-
 
         switch (msg.getOperation()){
             case CLIENT_SERVER_LOGIN -> {
                 if(msg.getMsg().size() == 2 && msg.getMsg().get(0) instanceof LoginStatus ls){
                     if(ls == LoginStatus.WRONG_CREDENTIALS) {
-                        fsm.getData().getUser().setStatus(LoginStatus.WRONG_CREDENTIALS);
-                        fsm.getData().getUser().setUsername(null);
-
+                        synchronized(fsm) {
+                            fsm.getData().getUser().setStatus(LoginStatus.WRONG_CREDENTIALS);
+                            fsm.getData().getUser().setUsername(null);
+                        }
                         ClientUI.showMessage("Credenciais Incorretas", false);
                     } else {
                         if(msg.getMsg().get(1) instanceof String username) {
-                            fsm.getData().getUser().setStatus(ls);
-                            fsm.getData().getUser().setUsername(username);
-                            fsm.changeState(ClientState.CONSULTA_PESQUISA_ESPETACULOS.createState(fsm, fsm.getData()));
+                            synchronized(fsm) {
+                                fsm.getData().getUser().setStatus(ls);
+                                fsm.getData().getUser().setUsername(username);
+                                fsm.changeState(ClientState.CONSULTA_PESQUISA_ESPETACULOS.createState(fsm, fsm.getData()));
+                            }
                             ClientUI.showMessage("Bem vindo " + username, true);
                         }
                     }

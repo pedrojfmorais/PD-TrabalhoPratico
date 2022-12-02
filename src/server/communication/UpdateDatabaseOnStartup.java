@@ -13,13 +13,12 @@ import java.net.Socket;
 import java.net.SocketException;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 
-public class UpdateDatabaseOnStartup{
+public class UpdateDatabaseOnStartup {
 
-    List<Heartbeat> listaServidores;
-    ConnDB connDB;
+    final List<Heartbeat> listaServidores;
+    final ConnDB connDB;
 
     public UpdateDatabaseOnStartup(List<Heartbeat> listaServidores, ConnDB connDB) {
         this.listaServidores = listaServidores;
@@ -29,14 +28,15 @@ public class UpdateDatabaseOnStartup{
     public boolean updateDatabase() throws IOException, SQLException {
         sortListaServidores(listaServidores);
         for (var server : listaServidores)
-            if(establishConnectionTCP(server.getIpServer(), server.getTCP_PORT()))
+            if (establishConnectionTCP(server.getIpServer(), server.getTCP_PORT()))
                 return true;
         return false;
     }
 
-    private boolean establishConnectionTCP(String ip, int porto) throws IOException, SQLException {
-        Socket otherServer = new Socket(ip, porto);
 
+    private boolean establishConnectionTCP(String ip, int porto) throws IOException, SQLException {
+
+        Socket otherServer = new Socket(ip, porto);
         ObjectOutputStream oos = new ObjectOutputStream(otherServer.getOutputStream());
         ObjectInputStream ois = new ObjectInputStream(otherServer.getInputStream());
 
@@ -46,18 +46,17 @@ public class UpdateDatabaseOnStartup{
                 null)
         );
 
-        MsgTcp msgRec = null;
+        MsgTcp msgRec;
         try {
             msgRec = (MsgTcp) ois.readObject();
-        } catch (SocketException e){
-            //TODO: acabou conexão
-            throw new RuntimeException(e);
+        } catch (SocketException e) {
+            return false;
         } catch (IOException | ClassNotFoundException e) {
             throw new RuntimeException(e);
         }
 
-        if(msgRec.getMSG_TYPE() == TypeMsgTCP.CREATE_DB_COPY
-                && msgRec.getOperation().equals(MessagesTCPOperation.CREATE_DB_COPY_RESPOSTA)){
+        if (msgRec.getMSG_TYPE() == TypeMsgTCP.CREATE_DB_COPY
+                && msgRec.getOperation().equals(MessagesTCPOperation.CREATE_DB_COPY_RESPOSTA)) {
 
             List<List<List<String>>> records = new ArrayList<>();
 
@@ -71,16 +70,13 @@ public class UpdateDatabaseOnStartup{
         return false;
     }
 
-    public static void sortListaServidores(List<Heartbeat> listaServidores){
-        listaServidores.sort(new Comparator<Heartbeat>() {
-            @Override
-            public int compare(Heartbeat o1, Heartbeat o2) {
-                int comparison = o1.getLOCAL_DB_VERSION() - o2.getLOCAL_DB_VERSION();
+    public static void sortListaServidores(List<Heartbeat> listaServidores) {
+        listaServidores.sort((o1, o2) -> {
+            int comparison = o1.getLOCAL_DB_VERSION() - o2.getLOCAL_DB_VERSION();
 
-                if (comparison == 0)
-                    return o1.compareTo(o2);
-                return comparison;
-            }
+            if (comparison == 0)
+                return o1.compareTo(o2);
+            return comparison;
         });
     }
 }

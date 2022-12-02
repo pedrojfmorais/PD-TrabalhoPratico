@@ -9,7 +9,6 @@ import server.model.data.ServerTCPConnection;
 
 import java.io.IOException;
 import java.net.Socket;
-import java.util.ArrayList;
 import java.util.List;
 
 import static client.model.communication.StartConnectionToServer.getActiveServers;
@@ -18,7 +17,7 @@ import static client.model.communication.StartConnectionToServer.testTCPServer;
 public class Client {
 
     ClientContext fsm;
-    private User user;
+    private final User user;
     ThreadTCPWithServer tcpConnection;
     List<ServerTCPConnection> listaServidores;
     final String IP_SERVER;
@@ -66,6 +65,7 @@ public class Client {
                 new Socket(serverTCPConnected.getIP(), serverTCPConnected.getPORT()),
                 listaServidores
         );
+        tcpConnection.setDaemon(true);
         tcpConnection.start();
 
         ClientUI.showMessage(
@@ -73,5 +73,13 @@ public class Client {
                 true);
 
         return true;
+    }
+
+    public void exit(){
+        try {
+            tcpConnection.close();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

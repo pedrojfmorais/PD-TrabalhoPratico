@@ -16,13 +16,13 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ThreadReceiveTCPMsg extends Thread{
+public class ThreadReceiveTCPMsg extends Thread {
 
-    private ConnDB connDB;
-    private Socket cliSocket;
-    private Heartbeat serverData;
-    private ObjectOutputStream oos;
-    private ObjectInputStream ois;
+    private final ConnDB connDB;
+    private final Socket cliSocket;
+    private final Heartbeat serverData;
+    private final ObjectOutputStream oos;
+    private final ObjectInputStream ois;
     private boolean threadContinue = true;
 
     public ThreadReceiveTCPMsg(Socket cliSocket, ConnDB connDB, Heartbeat serverData) throws IOException {
@@ -37,24 +37,30 @@ public class ThreadReceiveTCPMsg extends Thread{
     @Override
     public void run() {
 
-        do{
-            MsgTcp msgRec = null;
+        do {
+            MsgTcp msgRec;
             try {
                 msgRec = (MsgTcp) ois.readObject();
-            } catch (SocketException e){
-                //TODO: acabou conexão
-                throw new RuntimeException(e);
+            } catch (SocketException e) {
+                try {
+                    cliSocket.close();
+                } catch (IOException ignored) {
+                }
+                close();
+                break;
             } catch (IOException | ClassNotFoundException e) {
                 throw new RuntimeException(e);
             }
 
             try {
+
                 tratarMensagem(msgRec);
                 serverData.setLOCAL_DB_VERSION(connDB.getVersionDB());
+
             } catch (SQLException | IOException e) {
                 throw new RuntimeException(e);
             }
-        }while (threadContinue);
+        } while (threadContinue);
 
         try {
             cliSocket.close();
@@ -63,27 +69,25 @@ public class ThreadReceiveTCPMsg extends Thread{
         }
     }
 
-    public void close(){
+    public void close() {
         threadContinue = false;
     }
 
     public void tratarMensagem(MsgTcp msg) throws SQLException, IOException {
-        switch (msg.getMSG_TYPE()){
-            case CLIENT  -> tratarMensagemCliente(msg);
-            case CREATE_DB_COPY -> {
-                sendMsg(new MsgTcp(
-                        TypeMsgTCP.CREATE_DB_COPY,
-                        MessagesTCPOperation.CREATE_DB_COPY_RESPOSTA,
-                        new ArrayList<>(connDB.exportDB())
-                ));
-            }
+        switch (msg.getMSG_TYPE()) {
+            case CLIENT -> tratarMensagemCliente(msg);
+            case CREATE_DB_COPY -> sendMsg(new MsgTcp(
+                    TypeMsgTCP.CREATE_DB_COPY,
+                    MessagesTCPOperation.CREATE_DB_COPY_RESPOSTA,
+                    new ArrayList<>(connDB.exportDB())
+            ));
             default -> new MsgTcp(TypeMsgTCP.REPLY_SERVER, null, null);
         }
     }
 
     public void tratarMensagemCliente(MsgTcp msg) throws SQLException, IOException {
         MessagesTCPOperation operation = msg.getOperation();
-        if(operation == MessagesTCPOperation.CLIENT_SERVER_HELLO) {
+        if (operation == MessagesTCPOperation.CLIENT_SERVER_HELLO) {
             sendMsg(new MsgTcp(
                     TypeMsgTCP.REPLY_SERVER,
                     MessagesTCPOperation.CLIENT_SERVER_HELLO,
@@ -92,7 +96,7 @@ public class ThreadReceiveTCPMsg extends Thread{
             return;
         }
 
-        switch(operation){
+        switch (operation) {
             case CLIENT_SERVER_LOGIN -> {
                 LoginStatus ls = LoginStatus.WRONG_CREDENTIALS;
                 if (msg.getMsg().get(0) instanceof String username
@@ -104,7 +108,7 @@ public class ThreadReceiveTCPMsg extends Thread{
                                 TypeMsgTCP.REPLY_SERVER,
                                 MessagesTCPOperation.CLIENT_SERVER_LOGIN,
                                 List.of(ls, msg.getMsg().get(0))
-                                )
+                        )
                 );
             }
             case CLIENT_SERVER_REGISTER -> {
@@ -130,7 +134,7 @@ public class ThreadReceiveTCPMsg extends Thread{
             case CLIENT_SERVER_ELIMINAR_ESPETACULO -> {
                 boolean result = false;
                 int id = (int) msg.getMsg().get(0);
-                if(connDB.verifyEspetaculoExists(id))
+                if (connDB.verifyEspetaculoExists(id))
                     result = connDB.eliminarEspetaculo(id);
 
                 sendMsg(
@@ -144,7 +148,7 @@ public class ThreadReceiveTCPMsg extends Thread{
             case CLIENT_SERVER_EDITAR_ESPETACULO -> {
                 boolean result = false;
                 int id = (int) msg.getMsg().get(0);
-                if(connDB.verifyEspetaculoExists(id))
+                if (connDB.verifyEspetaculoExists(id))
                     result = connDB.editarEspetaculo(id);
 
                 sendMsg(
@@ -159,7 +163,7 @@ public class ThreadReceiveTCPMsg extends Thread{
                 // TODO ???
             }
             case CLIENT_SERVER_PESQUISA_ESPETACULO -> {
-                if(msg.getMsg().get(0) instanceof String filtro) {
+                if (msg.getMsg().get(0) instanceof String filtro) {
 
                     List<Espetaculo> espetaculos = new ArrayList<>(connDB.pesquisarEspetaculo(filtro));
 
@@ -175,7 +179,7 @@ public class ThreadReceiveTCPMsg extends Thread{
             case CLIENT_SERVER_PAGAR_RESERVA -> {
                 boolean result = false;
                 int id = (int) msg.getMsg().get(0);
-                if(connDB.verifyReservaExists(id))
+                if (connDB.verifyReservaExists(id))
                     result = connDB.pagarReserva(id);
 
                 sendMsg(
@@ -190,7 +194,7 @@ public class ThreadReceiveTCPMsg extends Thread{
             case CLIENT_SERVER_ELIMINAR_RESERVA -> {
                 boolean result = false;
                 int id = (int) msg.getMsg().get(0);
-                if(connDB.verifyReservaExists(id))
+                if (connDB.verifyReservaExists(id))
                     result = connDB.eliminarReserva(id);
 
                 sendMsg(

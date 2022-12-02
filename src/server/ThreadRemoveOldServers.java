@@ -31,13 +31,6 @@ public class ThreadRemoveOldServers extends Thread{
                                             > TIMEOUT_REMOVE_OLD_SERVERS_MILLISECONDS)
                                      || !server.isDISPONIVEL());
                 }
-
-                //TODO: Testing
-                System.out.println("Remover Antigos:");
-                for (var a : listaServidores)
-                    System.out.println(a.getIpServer() + " " + a.getTCP_PORT());
-                System.out.println();
-                //TODO: Fim Testing
             }
         } catch (InterruptedException e) {
             throw new RuntimeException(e);

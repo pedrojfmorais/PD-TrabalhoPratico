@@ -6,7 +6,7 @@ import java.io.IOException;
 
 public class ClientContext {
 
-    private Client data;
+    private final Client data;
     private IClientState state;
 
     public ClientContext(String IP_SERVER, int PORT_UDP){
@@ -37,6 +37,8 @@ public class ClientContext {
     public void register(String username, String nome, String password){
         state.register(username, nome, password);
     }
+
+    public void exit(){data.exit();}
 
     //TODO: tudo
 

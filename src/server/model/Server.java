@@ -8,11 +8,8 @@ import server.model.jdbc.ConnDB;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.Socket;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
 public class Server {
@@ -21,10 +18,10 @@ public class Server {
     private int localDbVersion = 0;
     private ConnDB connDB;
     private final String BD_FILE;
-    private ArrayList<Thread> allThreads;
+    private final ArrayList<Thread> allThreads;
     private Heartbeat serverData;
-    private List<Heartbeat> listaServidores;
-    private List<ThreadReceiveTCPMsg> listaClientes;
+    private final List<Heartbeat> listaServidores;
+    private final List<ThreadReceiveTCPMsg> listaClientes;
 
     public Server(int udp_port, String db_path){
 
@@ -44,21 +41,6 @@ public class Server {
     }
 
     public void start() throws InterruptedException {
-//        List<List<List<String>>> records;
-//        try {
-//            records = connDB.exportDB();
-//        } catch (SQLException e) {
-//            throw new RuntimeException(e);
-//        }
-//        System.out.println("ACABOU Export!");
-//        Thread.sleep(60 * 1000);
-//        System.out.println("Comecou import!");
-//        try {
-//            System.out.println(connDB.importDB(records));
-//        } catch (SQLException e) {
-//            throw new RuntimeException(e);
-//        }
-//        System.out.println("ACABOU Import!");
 
         ThreadReceiveMulticast trm = new ThreadReceiveMulticast(listaServidores);
         trm.start();
@@ -98,23 +80,6 @@ public class Server {
         //Quando tudo estiver ok
         serverData.setDISPONIVEL(true);
         startThreads();
-    }
-
-    public void testes() throws SQLException {
-
-        System.out.println(connDB.getVersionDB());
-
-//        connDB.addUser("pedrojfmorais", "pedro", "password");
-//        connDB.updateUser(2, "pedrojfmorais", "pedro", "pedro");
-
-        System.out.println(connDB.getUserInformation("pedro"));
-        System.out.println(connDB.getUserInformation("pedrojfmorais"));
-        System.out.println(connDB.getUserInformation("admin"));
-
-        System.out.println(connDB.verifyLogin("pedrojfmorais", "password"));
-        System.out.println(connDB.verifyLogin("admin", "admin"));
-        System.out.println(connDB.verifyLogin("pedrojfmorais", "123"));
-
     }
 
     public void startThreads(){

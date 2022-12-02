@@ -16,9 +16,9 @@ public class Lugar {
 
     @Override
     public boolean equals(Object obj) {
-        Lugar lugar = (Lugar) obj;
-        return lugar.fila.equals(fila) && lugar.assento.equals(assento);
-        // return super.equals(obj);
+        if(obj instanceof Lugar lugar)
+            return lugar.fila.equals(fila) && lugar.assento.equals(assento);
+        return false;
     }
 
     @Override

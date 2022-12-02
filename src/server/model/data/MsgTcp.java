@@ -1,8 +1,6 @@
 package server.model.data;
 
 import java.io.Serializable;
-import java.lang.reflect.Array;
-import java.util.ArrayList;
 import java.util.List;
 
 public class MsgTcp implements Serializable {

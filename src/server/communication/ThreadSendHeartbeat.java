@@ -1,7 +1,6 @@
 package server.communication;
 
 import server.model.data.Heartbeat;
-import server.model.jdbc.ConnDB;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;

@@ -9,7 +9,7 @@ import java.net.DatagramSocket;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ThreadReceiveUDPClients extends Thread{
+public class ThreadReceiveUDPClients extends Thread {
 
     private final List<Heartbeat> listaServidores;
     private final int UDP_PORT;
@@ -22,13 +22,11 @@ public class ThreadReceiveUDPClients extends Thread{
     @Override
     public void run() {
 
-        try {
-
-            DatagramSocket ds = new DatagramSocket(UDP_PORT);
+        try (DatagramSocket ds = new DatagramSocket(UDP_PORT)) {
 
             DatagramPacket dpRec = new DatagramPacket(new byte[256], 0, 256);
 
-            while(true) {
+            while (true) {
 
                 ds.receive(dpRec);
 
@@ -40,7 +38,7 @@ public class ThreadReceiveUDPClients extends Thread{
                 synchronized (listaServidores) {
 
                     for (Heartbeat h : listaServidores)
-                        if(h.isDISPONIVEL())
+                        if (h.isDISPONIVEL())
                             listaServidoresAEnviar.add(
                                     new ServerTCPConnection(h.getIpServer(), h.getTCP_PORT())
                             );

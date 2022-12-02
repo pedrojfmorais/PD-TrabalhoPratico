@@ -11,11 +11,11 @@ import java.util.List;
 
 public class ThreadReceiveNewTCPConnection extends Thread{
 
-    private List<Thread> listThreadsTCPConnections;
-    private List<ThreadReceiveTCPMsg> listaClientes;
-    private Heartbeat heartbeat;
+    private final List<Thread> listThreadsTCPConnections;
+    private final List<ThreadReceiveTCPMsg> listaClientes;
+    private final Heartbeat heartbeat;
     private ServerSocket ss;
-    private ConnDB connDB;
+    private final ConnDB connDB;
 
     public ThreadReceiveNewTCPConnection(Heartbeat heartbeat, List<ThreadReceiveTCPMsg> listaClientes, ConnDB connDB) {
         this.heartbeat = heartbeat;
@@ -42,8 +42,12 @@ public class ThreadReceiveNewTCPConnection extends Thread{
                 ThreadReceiveTCPMsg t = new ThreadReceiveTCPMsg(cliSocket, connDB, heartbeat);
                 t.start();
 
-                listaClientes.add(t);
-                listThreadsTCPConnections.add(t);
+                synchronized (listaClientes) {
+                    listaClientes.add(t);
+                }
+                synchronized (listThreadsTCPConnections) {
+                    listThreadsTCPConnections.add(t);
+                }
             }
 
         } catch (IOException e) {

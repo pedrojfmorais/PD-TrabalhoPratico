@@ -16,41 +16,43 @@ import java.util.Objects;
 import static server.model.data.Constants.TIMEOUT_WAIT_TCP_CONFIRMATION;
 
 public final class StartConnectionToServer {
-    private StartConnectionToServer() {}
+    private StartConnectionToServer() {
+    }
 
     public static ArrayList<ServerTCPConnection> getActiveServers(String ip, int portUDP) throws IOException, ClassNotFoundException {
-        DatagramSocket ds = new DatagramSocket();
-        ds.setSoTimeout(TIMEOUT_WAIT_TCP_CONFIRMATION);
-        InetAddress ipServer = InetAddress.getByName(ip);
+        try (DatagramSocket ds = new DatagramSocket()) {
+            ds.setSoTimeout(TIMEOUT_WAIT_TCP_CONFIRMATION);
+            InetAddress ipServer = InetAddress.getByName(ip);
 
-        byte[] msg = new byte[0];
+            byte[] msg = new byte[0];
 
-        DatagramPacket dpSend = new DatagramPacket(
-                msg,
-                msg.length,
-                ipServer,
-                portUDP
-        );
+            DatagramPacket dpSend = new DatagramPacket(
+                    msg,
+                    msg.length,
+                    ipServer,
+                    portUDP
+            );
 
-        ds.send(dpSend);
+            ds.send(dpSend);
 
-        DatagramPacket dpRec = new DatagramPacket(new byte[40000], 40000);
+            DatagramPacket dpRec = new DatagramPacket(new byte[40000], 40000);
 
-        try {
-            ds.receive(dpRec);
-        } catch (SocketTimeoutException s){
-            return new ArrayList<>();
+            try {
+                ds.receive(dpRec);
+            } catch (SocketTimeoutException s) {
+                return new ArrayList<>();
+            }
+
+            ByteArrayInputStream bais = new ByteArrayInputStream(dpRec.getData());
+            ObjectInputStream ois = new ObjectInputStream(bais);
+
+            return (ArrayList<ServerTCPConnection>) ois.readObject();
         }
-
-        ByteArrayInputStream bais = new ByteArrayInputStream(dpRec.getData());
-        ObjectInputStream ois = new ObjectInputStream(bais);
-
-        return (ArrayList<ServerTCPConnection>) ois.readObject();
     }
 
     public static boolean testTCPServer(ServerTCPConnection server) throws IOException, ClassNotFoundException {
 
-        Socket cliSocket = null;
+        Socket cliSocket;
         try {
             cliSocket = new Socket(server.getIP(), server.getPORT());
         } catch (IOException e) {

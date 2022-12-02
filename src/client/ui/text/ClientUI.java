@@ -47,7 +47,10 @@ public class ClientUI {
                     PAInput.readString("Insira o nome: ", true),
                     PAInput.readString("Insira a password: ", false)
             );
-            case 3 -> finish = true;
+            case 3 -> {
+                fsm.exit();
+                finish = true;
+            }
         }
     }
 
