@@ -130,6 +130,7 @@ public class ThreadReceiveTCPMsg extends Thread {
                             )
                     );
                 }
+
             }
             case CLIENT_SERVER_ELIMINAR_ESPETACULO -> {
                 boolean result = false;
