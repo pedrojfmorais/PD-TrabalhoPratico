@@ -14,6 +14,7 @@ import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.net.SocketException;
 import java.sql.SQLException;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -161,6 +162,26 @@ public class ThreadReceiveTCPMsg extends Thread {
                 }
 
             }
+            case CLIENT_SERVER_EDITAR_UTILIZADOR -> {
+                boolean insertUser = false;
+
+                if (msg.getMsg().get(0) instanceof String oldUsername
+                        && msg.getMsg().get(1) instanceof String username
+                        && msg.getMsg().get(2) instanceof String nome
+                        && msg.getMsg().get(3) instanceof String password) {
+
+                    if (!connDB.verifyUserExists(username, nome)) {
+                        insertUser = connDB.updateUser(oldUsername, username, nome, password);
+                    }
+                }
+                sendMsg(
+                        new MsgTcp(
+                                TypeMsgTCP.REPLY_SERVER,
+                                MessagesTCPOperation.CLIENT_SERVER_EDITAR_UTILIZADOR,
+                                List.of(insertUser, msg.getMsg().get(1))
+                        )
+                );
+            }
             case CLIENT_SERVER_ELIMINAR_ESPETACULO -> {
                 boolean result = false;
                 int id = (int) msg.getMsg().get(0);
@@ -179,7 +200,7 @@ public class ThreadReceiveTCPMsg extends Thread {
                 boolean result = false;
                 int id = (int) msg.getMsg().get(0);
                 if (connDB.verifyEspetaculoExists(id))
-                    result = connDB.editarEspetaculo(id);
+                    result = connDB.tornarEspetaculoVisivel(id);
 
                 sendMsg(
                         new MsgTcp(
@@ -193,9 +214,16 @@ public class ThreadReceiveTCPMsg extends Thread {
                 // TODO ???
             }
             case CLIENT_SERVER_PESQUISA_ESPETACULO -> {
-                if (msg.getMsg().get(0) instanceof String filtro) {
+                if (msg.getMsg().get(0) instanceof String filtro
+                        && msg.getMsg().get(1) instanceof LoginStatus ls) {
 
-                    List<Espetaculo> espetaculos = new ArrayList<>(connDB.pesquisarEspetaculo(filtro));
+                    List<Espetaculo> espetaculos;
+                    try {
+                        espetaculos = connDB.pesquisarEspetaculo(filtro,
+                                ls == LoginStatus.SUCCESSFUL_ADMIN_USER);
+                    } catch (ParseException e) {
+                        throw new RuntimeException(e);
+                    }
 
                     sendMsg(
                             new MsgTcp(

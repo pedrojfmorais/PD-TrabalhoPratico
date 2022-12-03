@@ -38,6 +38,21 @@ public class ClientContext {
         state.register(username, nome, password);
     }
 
+    public void pesquisaEspetaculos(String filtro){
+        state.pesquisarEspetaculo(filtro);
+    }
+    public void editarDadosUtilizador(String username, String nome, String password){
+        state.editarDadosUtilizador(username, nome, password);
+    }
+    public boolean logout(){return state.logout();}
+
+    public void removerEspetaculo(long id){
+        state.eliminarEspetaculo(Math.toIntExact(id));
+    }
+
+    public void tornarEspetaculoVisivel(long id){state.tornarEspetaculoVisivel(Math.toIntExact(id));}
+    public void minhasReservas(){state.minhasReservas();}
+
     //TODO: tudo
 
 }

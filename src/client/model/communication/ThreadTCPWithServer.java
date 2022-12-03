@@ -112,6 +112,30 @@ public class ThreadTCPWithServer extends Thread {
                 else
                     ClientUI.showMessage("Erro a inserir o utilizador", false);
             }
+            case CLIENT_SERVER_EDITAR_UTILIZADOR -> {
+                if (msg.getMsg().get(0) instanceof Boolean b && b) {
+                    ClientUI.showMessage("Utilizador atualizado com sucesso", false);
+                    fsm.getData().getUser().setUsername((String) msg.getMsg().get(1));
+                } else
+                    ClientUI.showMessage("Erro a atualizar os dados do utilizador", false);
+            }
+            case CLIENT_SERVER_PESQUISA_ESPETACULO -> {
+                List<Espetaculo> espetaculos = (List<Espetaculo>) msg.getMsg().get(0);
+                for (var espetaculo : espetaculos)
+                    ClientUI.showMessage(espetaculo + System.lineSeparator(), true);
+            }
+            case CLIENT_SERVER_ELIMINAR_ESPETACULO -> {
+                if (msg.getMsg().get(0) instanceof Boolean b && b)
+                    ClientUI.showMessage("Espetaculo eliminado com sucesso", false);
+                else
+                    ClientUI.showMessage("Erro a eliminar o espetaculo", false);
+            }
+            case CLIENT_SERVER_EDITAR_ESPETACULO -> {
+                if (msg.getMsg().get(0) instanceof Boolean b && b)
+                    ClientUI.showMessage("Espetaculo está visivel", false);
+                else
+                    ClientUI.showMessage("Espetaculo não existe", false);
+            }
         }
     }
 

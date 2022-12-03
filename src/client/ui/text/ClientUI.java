@@ -54,12 +54,53 @@ public class ClientUI {
     }
 
     private void consultaPesquisaEspetaculosUI() {
-        System.out.println("consultaPesquisaEspetaculoUI");
-        System.out.println(fsm.getData().getUser());
+        switch (fsm.getData().getUser().getStatus()){
+
+            case SUCCESSFUL_NORMAL_USER -> {
+                switch (PAInput.chooseOption("Pesquisa e Consulta de Espetaculo",
+                        "Pesquisar", "Editar dados conta utilizador",
+                        "Ver Minhas Reservas", "Logout")){
+                    case 1 -> fsm.pesquisaEspetaculos(
+                            PAInput.readString("Insira o filtro a procurar: ", false, true)
+                    );
+                    case 2 -> fsm.editarDadosUtilizador(
+                            PAInput.readString("Insira o novo username: ", false),
+                            PAInput.readString("Insira o novo nome: ", false),
+                            PAInput.readString("Insira a nova password: ", false)
+                    );
+                    case 3 -> fsm.minhasReservas();
+                    case 4 -> fsm.logout();
+                }
+            }
+            case SUCCESSFUL_ADMIN_USER -> {
+                switch (PAInput.chooseOption("Pesquisa e Consulta de Espetaculo",
+                        "Inserir Espetaculo", "Remover Espetaculo", "Tornar Espetaculo Visivel",
+                        "Pesquisar", "Editar dados conta utilizador", "Logout")){
+                    case 1 -> {
+                        //TODO: Mais logo
+                    }
+                    case 2 -> fsm.removerEspetaculo(
+                            PAInput.readLong("Insira o id do espetaculo a remover: ")
+                    );
+                    case 3 -> fsm.tornarEspetaculoVisivel(
+                            PAInput.readLong("Insira o id do espetaculo a tornar visivel: ")
+                    );
+                    case 4 -> fsm.pesquisaEspetaculos(
+                            PAInput.readString("Insira o filtro a procurar: ", false, true)
+                    );
+                    case 5 -> fsm.editarDadosUtilizador(
+                            PAInput.readString("Insira o novo username: ", false),
+                            PAInput.readString("Insira o novo nome: ", false),
+                            PAInput.readString("Insira a nova password: ", false)
+                    );
+                    case 6 -> fsm.logout();
+                }
+            }
+        }
     }
 
     private void minhasReservasUI() {
-
+        System.out.println("QUALQUER COISA");
     }
 
     private void selecionaEspetaculoUI() {

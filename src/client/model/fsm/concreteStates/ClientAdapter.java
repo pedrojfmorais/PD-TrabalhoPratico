@@ -35,14 +35,14 @@ abstract class ClientAdapter implements IClientState{
     public boolean eliminarEspetaculo(int id) { return false; }
 
     @Override
-    public boolean editarEstadoEspetaculo(int id) { return false; }
+    public boolean tornarEspetaculoVisivel(int id) { return false; }
 
     @Override
     public void pesquisarEspetaculo(String filtro) {
     }
 
     @Override
-    public void editarDadosUtilizador(String... dados) {
+    public void editarDadosUtilizador(String username, String nome, String password) {
     }
 
     @Override

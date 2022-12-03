@@ -37,36 +37,41 @@ public class UpdateDatabaseOnStartup {
     private boolean establishConnectionTCP(String ip, int porto) throws IOException, SQLException {
 
         Socket otherServer = new Socket(ip, porto);
-        ObjectOutputStream oos = new ObjectOutputStream(otherServer.getOutputStream());
-        ObjectInputStream ois = new ObjectInputStream(otherServer.getInputStream());
-
-        oos.writeUnshared(new MsgTcp(
-                TypeMsgTCP.CREATE_DB_COPY,
-                MessagesTCPOperation.CREATE_DB_COPY_PEDIDO,
-                null)
-        );
-
-        MsgTcp msgRec;
         try {
-            msgRec = (MsgTcp) ois.readObject();
-        } catch (SocketException e) {
+            ObjectOutputStream oos = new ObjectOutputStream(otherServer.getOutputStream());
+            ObjectInputStream ois = new ObjectInputStream(otherServer.getInputStream());
+
+            oos.writeUnshared(new MsgTcp(
+                    TypeMsgTCP.CREATE_DB_COPY,
+                    MessagesTCPOperation.CREATE_DB_COPY_PEDIDO,
+                    null)
+            );
+
+            MsgTcp msgRec;
+            try {
+                msgRec = (MsgTcp) ois.readObject();
+            } catch (SocketException e) {
+                return false;
+            } catch (IOException | ClassNotFoundException e) {
+                throw new RuntimeException(e);
+            }
+
+            if (msgRec.getMSG_TYPE() == TypeMsgTCP.CREATE_DB_COPY
+                    && msgRec.getOperation().equals(MessagesTCPOperation.CREATE_DB_COPY_RESPOSTA)) {
+
+                List<List<List<String>>> records = new ArrayList<>();
+
+                for (var tabela : msgRec.getMsg())
+                    records.add((List<List<String>>) tabela);
+                connDB.clearDB();
+                return connDB.importDB(records);
+            }
+
             return false;
-        } catch (IOException | ClassNotFoundException e) {
-            throw new RuntimeException(e);
+
+        } finally {
+            otherServer.close();
         }
-
-        if (msgRec.getMSG_TYPE() == TypeMsgTCP.CREATE_DB_COPY
-                && msgRec.getOperation().equals(MessagesTCPOperation.CREATE_DB_COPY_RESPOSTA)) {
-
-            List<List<List<String>>> records = new ArrayList<>();
-
-            for (var tabela : msgRec.getMsg())
-                records.add((List<List<String>>) tabela);
-            connDB.clearDB();
-            return connDB.importDB(records);
-        }
-
-        return false;
     }
 
     public static void sortListaServidores(List<Heartbeat> listaServidores) {

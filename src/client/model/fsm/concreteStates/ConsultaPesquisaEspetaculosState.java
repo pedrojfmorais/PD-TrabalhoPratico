@@ -64,7 +64,7 @@ public class ConsultaPesquisaEspetaculosState extends ClientAdapter {
             // Removes quotes
             token = token.replaceAll("\"", "");
 
-        } while(token.startsWith("\"") || token.endsWith("\"") || token.startsWith(" ") || token.endsWith(" "));
+        } while (token.startsWith("\"") || token.endsWith("\"") || token.startsWith(" ") || token.endsWith(" "));
         return token;
     }
 
@@ -92,8 +92,8 @@ public class ConsultaPesquisaEspetaculosState extends ClientAdapter {
 
         filename = "src/aMarcoTest/espetaculo.csv";
 
-        try(FileReader fr = new FileReader(filename);
-            BufferedReader br = new BufferedReader(fr)){
+        try (FileReader fr = new FileReader(filename);
+             BufferedReader br = new BufferedReader(fr)) {
 
             String line;
             String linePurpose;
@@ -101,7 +101,7 @@ public class ConsultaPesquisaEspetaculosState extends ClientAdapter {
                 String[] tokens = line.split(";");
                 linePurpose = prepareToSave(tokens[0]);
 
-                if(linePurpose.equals("Designação")) {
+                if (linePurpose.equals("Designação")) {
                     designacao = prepareToSave(tokens[1]);
                 } else if (linePurpose.equals("Tipo")) {
                     tipo = prepareToSave(tokens[1]);
@@ -122,7 +122,7 @@ public class ConsultaPesquisaEspetaculosState extends ClientAdapter {
                 } else if (linePurpose.equals("Classificação etária")) {
                     classificacao = prepareToSave(tokens[1]);
                 } else if (linePurpose.equals("Fila")) {
-                } else if(linePurpose.length() == 1) {
+                } else if (linePurpose.length() == 1) {
                     // Remove first
                     String[] modifiedTokens = Arrays.copyOfRange(tokens, 1, tokens.length);
 
@@ -133,7 +133,7 @@ public class ConsultaPesquisaEspetaculosState extends ClientAdapter {
                         Lugar lugar = new Lugar(0, linePurpose.toUpperCase(), seat[0], Double.parseDouble(seat[1]));
 
                         // If seat has been registered, stop
-                        if(lugares.contains(lugar)) {
+                        if (lugares.contains(lugar)) {
                             //System.out.println("Errou " + linePurpose.toUpperCase() + " " + seat[0] + " " + seat[1]);
                             return false;
                         }
@@ -141,7 +141,7 @@ public class ConsultaPesquisaEspetaculosState extends ClientAdapter {
                     }
                 } else {
                     // If invalid field, stop
-                    if(linePurpose.length() != 0)
+                    if (linePurpose.length() != 0)
                         return false;
                     //System.out.println("MORREU " + line + " " + linePurpose);
                 }
@@ -154,13 +154,10 @@ public class ConsultaPesquisaEspetaculosState extends ClientAdapter {
         }
 
         try {
-            date = new SimpleDateFormat("dd/MM/yyyy HH:mm").parse(dias + " " + horas);
+            date = new SimpleDateFormat(Constants.DATE_FORMAT).parse(dias + " " + horas);
         } catch (ParseException e) {
             throw new RuntimeException(e);
         }
-
-
-
 
         try {
 
@@ -182,7 +179,7 @@ public class ConsultaPesquisaEspetaculosState extends ClientAdapter {
 
     @Override
     public boolean eliminarEspetaculo(int id) {
-        if(!isAdminUser())
+        if (!isAdminUser())
             return false;
 
         try {
@@ -200,12 +197,11 @@ public class ConsultaPesquisaEspetaculosState extends ClientAdapter {
     }
 
     @Override
-    public boolean editarEstadoEspetaculo(int id) {
-        if(!isAdminUser())
+    public boolean tornarEspetaculoVisivel(int id) {
+        if (!isAdminUser())
             return false;
 
         try {
-
             data.getTcpConnection().sendMsg(
                     new MsgTcp(
                             TypeMsgTCP.CLIENT,
@@ -249,7 +245,7 @@ public class ConsultaPesquisaEspetaculosState extends ClientAdapter {
                     new MsgTcp(
                             TypeMsgTCP.CLIENT,
                             MessagesTCPOperation.CLIENT_SERVER_PESQUISA_ESPETACULO,
-                            List.of(filtro))
+                            List.of(filtro, data.getUser().getStatus()))
             );
         } catch (IOException | ClassNotFoundException e) {
             throw new RuntimeException(e);
@@ -257,14 +253,13 @@ public class ConsultaPesquisaEspetaculosState extends ClientAdapter {
     }
 
     @Override
-    public void editarDadosUtilizador(String... dados) {
+    public void editarDadosUtilizador(String username, String nome, String password) {
         try {
-
             data.getTcpConnection().sendMsg(
                     new MsgTcp(
                             TypeMsgTCP.CLIENT,
                             MessagesTCPOperation.CLIENT_SERVER_EDITAR_UTILIZADOR,
-                            List.of(dados))
+                            List.of(data.getUser().getUsername(), username, nome, password))
             );
         } catch (IOException | ClassNotFoundException e) {
             throw new RuntimeException(e);
