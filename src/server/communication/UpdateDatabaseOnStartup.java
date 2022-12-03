@@ -62,7 +62,6 @@ public class UpdateDatabaseOnStartup {
 
             for (var tabela : msgRec.getMsg())
                 records.add((List<List<String>>) tabela);
-
             connDB.clearDB();
             return connDB.importDB(records);
         }
@@ -72,7 +71,7 @@ public class UpdateDatabaseOnStartup {
 
     public static void sortListaServidores(List<Heartbeat> listaServidores) {
         listaServidores.sort((o1, o2) -> {
-            int comparison = o1.getLOCAL_DB_VERSION() - o2.getLOCAL_DB_VERSION();
+            int comparison = o2.getLOCAL_DB_VERSION() - o1.getLOCAL_DB_VERSION();
 
             if (comparison == 0)
                 return o1.compareTo(o2);

@@ -1,9 +1,15 @@
 package server.model.data.syncDB;
 
-public class Abort {
-    int versionDB;
+import java.io.Serializable;
 
-    public Abort(int versionDB) {
-        this.versionDB = versionDB;
+public class Abort implements Serializable {
+    private final int idPrepare;
+
+    public Abort(int idPrepare) {
+        this.idPrepare = idPrepare;
+    }
+
+    public int getIdPrepare() {
+        return idPrepare;
     }
 }

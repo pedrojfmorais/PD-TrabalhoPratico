@@ -89,7 +89,7 @@ public class Server {
 
 
         ThreadReceiveNewTCPConnection trtcpc = new ThreadReceiveNewTCPConnection(
-                serverData, listaClientes, connDB, atualizaClientes
+                serverData, listaClientes, connDB, atualizaClientes, listaServidores
         );
         trtcpc.start();
 

@@ -56,7 +56,6 @@ public class Client {
                     break;
                 }
             }catch (SocketException | EOFException ignored){
-                System.out.println("aqui");
             } catch (IOException | ClassNotFoundException e) {
                 throw new RuntimeException(e);
             }

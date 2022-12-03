@@ -1,9 +1,15 @@
 package server.model.data.syncDB;
 
-public class Commit {
-    int versionDB;
+import java.io.Serializable;
 
-    public Commit(int versionDB) {
-        this.versionDB = versionDB;
+public class Commit implements Serializable {
+    private final int idPrepare;
+
+    public Commit(int idPrepare) {
+        this.idPrepare = idPrepare;
+    }
+
+    public int getIdPrepare() {
+        return idPrepare;
     }
 }

@@ -15,10 +15,11 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.net.SocketException;
+import java.sql.SQLOutput;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class ThreadTCPWithServer extends Thread{
+public class ThreadTCPWithServer extends Thread {
 
     final ClientContext fsm;
     Socket serverSocket;
@@ -39,15 +40,18 @@ public class ThreadTCPWithServer extends Thread{
 
     @Override
     public void run() {
-        do{
+        do {
             MsgTcp msgRec;
             try {
                 msgRec = (MsgTcp) ois.readObject();
                 tratarMensagem(msgRec);
-            } catch (SocketException e){
+            } catch (SocketException e) {
                 try {
                     synchronized (fsm) {
-                        new NoServerConnectedState(fsm, fsm.getData()).tryConnectToServer(false);
+                        if (!new NoServerConnectedState(fsm, fsm.getData()).tryConnectToServer(false)) {
+                            ClientUI.showMessage("Não existem servidores disponiveis!", false);
+                            System.exit(1);
+                        }
                     }
                     close();
                     break;
@@ -59,16 +63,16 @@ public class ThreadTCPWithServer extends Thread{
                 throw new RuntimeException(e);
             }
 
-        }while(true);
+        } while (true);
     }
 
     public void tratarMensagem(MsgTcp msg) throws IOException, ClassNotFoundException {
 
-        if(msg.getOperation() == MessagesTCPOperation.CLIENT_SERVER_HELLO && msg.getMsg().get(0).equals("SERVER_OK"))
+        if (msg.getOperation() == MessagesTCPOperation.CLIENT_SERVER_HELLO && msg.getMsg().get(0).equals("SERVER_OK"))
             return;
 
-        if(msg.getMSG_TYPE() == TypeMsgTCP.SERVER_ASYNC){
-            switch (msg.getOperation()){
+        if (msg.getMSG_TYPE() == TypeMsgTCP.SERVER_ASYNC) {
+            switch (msg.getOperation()) {
                 case SERVER_ASYNC_RESET_CONNECTION -> {
                     listaServidores = msg.getMsg().stream()
                             .map(object -> (ServerTCPConnection) object)
@@ -76,22 +80,22 @@ public class ThreadTCPWithServer extends Thread{
                     close();
                 }
                 case SERVER_ASYNC_UPDATE_SERVER_LIST ->
-                    listaServidores = (List<ServerTCPConnection>) msg.getMsg().get(0);
+                        listaServidores = (List<ServerTCPConnection>) msg.getMsg().get(0);
             }
         }
 
-        switch (msg.getOperation()){
+        switch (msg.getOperation()) {
             case CLIENT_SERVER_LOGIN -> {
-                if(msg.getMsg().size() == 2 && msg.getMsg().get(0) instanceof LoginStatus ls){
-                    if(ls == LoginStatus.WRONG_CREDENTIALS) {
-                        synchronized(fsm) {
+                if (msg.getMsg().size() == 2 && msg.getMsg().get(0) instanceof LoginStatus ls) {
+                    if (ls == LoginStatus.WRONG_CREDENTIALS) {
+                        synchronized (fsm) {
                             fsm.getData().getUser().setStatus(LoginStatus.WRONG_CREDENTIALS);
                             fsm.getData().getUser().setUsername(null);
                         }
                         ClientUI.showMessage("Credenciais Incorretas", false);
                     } else {
-                        if(msg.getMsg().get(1) instanceof String username) {
-                            synchronized(fsm) {
+                        if (msg.getMsg().get(1) instanceof String username) {
+                            synchronized (fsm) {
                                 fsm.getData().getUser().setStatus(ls);
                                 fsm.getData().getUser().setUsername(username);
                                 fsm.changeState(ClientState.CONSULTA_PESQUISA_ESPETACULOS.createState(fsm, fsm.getData()));
@@ -99,11 +103,11 @@ public class ThreadTCPWithServer extends Thread{
                             ClientUI.showMessage("Bem vindo " + username, true);
                         }
                     }
-                }else
+                } else
                     ClientUI.showMessage("Erro na comunicação com o servidor!", false);
             }
             case CLIENT_SERVER_REGISTER -> {
-                if(msg.getMsg().get(0) instanceof Boolean b && b)
+                if (msg.getMsg().get(0) instanceof Boolean b && b)
                     ClientUI.showMessage("Utilizador inserido com sucesso", false);
                 else
                     ClientUI.showMessage("Erro a inserir o utilizador", false);

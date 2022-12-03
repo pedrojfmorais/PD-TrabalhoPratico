@@ -13,17 +13,20 @@ public class ThreadReceiveNewTCPConnection extends Thread{
 
     private final List<Thread> listThreadsTCPConnections;
     private final List<ThreadReceiveTCPMsg> listaClientes;
+    private final List<Heartbeat> listaServidores;
     private SendListaServidoresClientesTCP atualizaClientes;
     private final Heartbeat serverData;
     private ServerSocket ss;
     private final ConnDB connDB;
 
     public ThreadReceiveNewTCPConnection(Heartbeat serverData, List<ThreadReceiveTCPMsg> listaClientes,
-                                         ConnDB connDB, SendListaServidoresClientesTCP atualizaClientes) {
+                                         ConnDB connDB, SendListaServidoresClientesTCP atualizaClientes,
+                                         List<Heartbeat> listaServidores) {
         this.serverData = serverData;
         this.listaClientes = listaClientes;
         this.connDB = connDB;
         this.atualizaClientes = atualizaClientes;
+        this.listaServidores = listaServidores;
 
         listThreadsTCPConnections = new ArrayList<>();
 
@@ -44,7 +47,8 @@ public class ThreadReceiveNewTCPConnection extends Thread{
 
                 Socket cliSocket = ss.accept();
 
-                ThreadReceiveTCPMsg t = new ThreadReceiveTCPMsg(cliSocket, connDB, serverData, atualizaClientes);
+                ThreadReceiveTCPMsg t = new ThreadReceiveTCPMsg(cliSocket, connDB, serverData,
+                        atualizaClientes, listaServidores);
                 t.start();
 
                 synchronized (listaClientes) {

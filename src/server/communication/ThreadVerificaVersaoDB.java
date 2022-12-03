@@ -39,11 +39,13 @@ public class ThreadVerificaVersaoDB extends Thread {
         do {
             try {
                 Thread.sleep(TIMEOUT_HEARTBEAT_MILLISECONDS);
-
-                UpdateDatabaseOnStartup.sortListaServidores(listaServidores);
-                if (connDB.getVersionDB() < listaServidores.get(listaServidores.size() - 1).getLOCAL_DB_VERSION())
-                    updateDatabase();
-
+                serverData.setLOCAL_DB_VERSION(connDB.getVersionDB());
+                synchronized (listaServidores) {
+                    UpdateDatabaseOnStartup.sortListaServidores(listaServidores);
+                    if(listaServidores.size() > 0)
+                        if (serverData.getLOCAL_DB_VERSION() < listaServidores.get(0).getLOCAL_DB_VERSION())
+                            updateDatabase();
+                }
             } catch (InterruptedException | SQLException | IOException e) {
                 throw new RuntimeException(e);
             }
@@ -60,14 +62,12 @@ public class ThreadVerificaVersaoDB extends Thread {
         Collections.sort(listaServidores);
 
         List<ServerTCPConnection> listaServidoresAEnviar = new ArrayList<>();
-        synchronized (listaServidores) {
 
-            for (Heartbeat h : listaServidores)
-                if (h.isDISPONIVEL())
-                    listaServidoresAEnviar.add(
-                            new ServerTCPConnection(h.getIpServer(), h.getTCP_PORT())
-                    );
-        }
+        for (Heartbeat h : listaServidores)
+            if (h.isDISPONIVEL())
+                listaServidoresAEnviar.add(
+                        new ServerTCPConnection(h.getIpServer(), h.getTCP_PORT())
+                );
 
         synchronized (listaClientes) {
             for (var cliente : listaClientes) {

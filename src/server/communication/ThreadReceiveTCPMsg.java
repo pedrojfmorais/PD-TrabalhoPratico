@@ -22,17 +22,20 @@ public class ThreadReceiveTCPMsg extends Thread {
     private final ConnDB connDB;
     private final Socket cliSocket;
     private final Heartbeat serverData;
+    private final List<Heartbeat> listaServidores;
     private SendListaServidoresClientesTCP atualizaClientes;
     private final ObjectOutputStream oos;
     private final ObjectInputStream ois;
     private boolean threadContinue = true;
 
     public ThreadReceiveTCPMsg(Socket cliSocket, ConnDB connDB,
-                               Heartbeat serverData, SendListaServidoresClientesTCP atualizaClientes) throws IOException {
+                               Heartbeat serverData, SendListaServidoresClientesTCP atualizaClientes,
+                               List<Heartbeat> listaServidores) throws IOException {
         this.cliSocket = cliSocket;
         this.connDB = connDB;
         this.serverData = serverData;
         this.atualizaClientes = atualizaClientes;
+        this.listaServidores = listaServidores;
 
         oos = new ObjectOutputStream(cliSocket.getOutputStream());
         ois = new ObjectInputStream(cliSocket.getInputStream());
@@ -132,8 +135,21 @@ public class ThreadReceiveTCPMsg extends Thread {
                         && msg.getMsg().get(1) instanceof String nome
                         && msg.getMsg().get(2) instanceof String password) {
 
-                    if (!connDB.verifyUserExists(username, nome))
+                    if (!connDB.verifyUserExists(username, nome)) {
                         insertUser = connDB.insertUser(username, nome, password);
+//
+//                        if(dbSync) {
+//                            //PREPARE
+//                            System.out.println("PREPARE");
+//                            try {
+//                                if(KeepDatabaseConsistency.sendPrepare(msg, serverData.getLOCAL_DB_VERSION()+1,
+//                                        listaServidores, connDB))
+//
+//                            } catch (IOException e) {
+//                                throw new RuntimeException(e);
+//                            }
+//                        }
+                    }
 
                     sendMsg(
                             new MsgTcp(
@@ -203,7 +219,6 @@ public class ThreadReceiveTCPMsg extends Thread {
                                 List.of(result)
                         )
                 );
-
             }
             case CLIENT_SERVER_ELIMINAR_RESERVA -> {
                 boolean result = false;
@@ -237,7 +252,6 @@ public class ThreadReceiveTCPMsg extends Thread {
 
     public void sendMsg(MsgTcp msgSend){
         try {
-
             oos.reset();
             oos.writeUnshared(msgSend);
 
