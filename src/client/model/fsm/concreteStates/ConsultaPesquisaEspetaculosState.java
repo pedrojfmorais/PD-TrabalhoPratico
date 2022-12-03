@@ -74,11 +74,11 @@ public class ConsultaPesquisaEspetaculosState extends ClientAdapter {
     @Override
     public boolean inserirEspetaculo(String filename) {
 
-        int id = -1;
+        int id = 0;
         boolean visibilidade = false;
         String designacao = "";
         String tipo = "";
-        Date data = new Date();
+        Date date = new Date();
         int duracao = 0;
         String local = "";
         String localidade = "";
@@ -121,23 +121,27 @@ public class ConsultaPesquisaEspetaculosState extends ClientAdapter {
                     classificacao = prepareToSave(tokens[1]);
                 } else if (linePurpose.equals("Fila")) {
                 } else if(linePurpose.length() == 1) {
-                    //TODO Filas
+                    // Remove first
                     String[] modifiedTokens = Arrays.copyOfRange(tokens, 1, tokens.length);
 
                     for (String tok : modifiedTokens) {
+                        // Separate seat from price
                         String[] seat = prepareToSave(tok).split(":");
-                        // ID??????
-                        Lugar lugar = new Lugar(-1, linePurpose.toUpperCase(), seat[0], Double.parseDouble(seat[1]));
+                        // Create new Lugar
+                        Lugar lugar = new Lugar(0, linePurpose.toUpperCase(), seat[0], Double.parseDouble(seat[1]));
+
+                        // If seat has been registered, stop
                         if(lugares.contains(lugar)) {
-                            // TODO CANCEL EVERYTHING
-                            System.out.println("Errou " + linePurpose.toUpperCase() + " " + seat[0] + " " + seat[1]);
+                            //System.out.println("Errou " + linePurpose.toUpperCase() + " " + seat[0] + " " + seat[1]);
+                            return false;
                         }
                         lugares.add(lugar);
                     }
                 } else {
-                    // TODO CANCEL EVERYTHING
+                    // If invalid field, stop
                     if(linePurpose.length() != 0)
-                        System.out.println("MORREU " + line + " " + linePurpose);
+                        return false;
+                    //System.out.println("MORREU " + line + " " + linePurpose);
                 }
 
 
@@ -146,28 +150,29 @@ public class ConsultaPesquisaEspetaculosState extends ClientAdapter {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+
         try {
-            data = new SimpleDateFormat("dd/MM/yyyy HH:mm").parse(dias + " " + horas);
+            date = new SimpleDateFormat("dd/MM/yyyy HH:mm").parse(dias + " " + horas);
         } catch (ParseException e) {
             throw new RuntimeException(e);
         }
-        System.out.println(data);
 
 
 
 
-        /*try {
+        try {
 
             data.getTcpConnection().sendMsg(
                     new MsgTcp(
                             TypeMsgTCP.CLIENT,
-                            MessagesTCPOperation.ESPE,
-                            new Espetaculo(id, visibilidade, designacao, tipo, data, duracao, local, localidade, pais, classificacao, lugares)
+                            MessagesTCPOperation.CLIENT_SERVER_INSERIR_ESPETACULO,
+                            List.of(new Espetaculo(id, visibilidade, designacao, tipo, date, duracao, local, localidade, pais, classificacao, lugares))
                     )
             );
+
         } catch (IOException | ClassNotFoundException e) {
             throw new RuntimeException(e);
-        }*/
+        }
 
 
         return true;
