@@ -18,7 +18,6 @@ public class MinhasReservasState extends ClientAdapter{
     @Override
     public void pagarReserva(int id) {
         try {
-
             data.getTcpConnection().sendMsg(
                     new MsgTcp(
                             TypeMsgTCP.CLIENT,
@@ -33,7 +32,6 @@ public class MinhasReservasState extends ClientAdapter{
     @Override
     public void eliminarReservaNaoPaga(int id) {
         try {
-
             data.getTcpConnection().sendMsg(
                     new MsgTcp(
                             TypeMsgTCP.CLIENT,
@@ -53,7 +51,7 @@ public class MinhasReservasState extends ClientAdapter{
                     new MsgTcp(
                             TypeMsgTCP.CLIENT,
                             MessagesTCPOperation.CLIENT_SERVER_MOSTRAR_RESERVAS,
-                            List.of(reservaPaga))
+                            List.of(reservaPaga, data.getUser().getUsername()))
             );
         } catch (IOException | ClassNotFoundException e) {
             throw new RuntimeException(e);

@@ -2,6 +2,9 @@ package server.model.jdbc;
 
 import server.model.data.*;
 import server.model.data.LoginStatus;
+import server.model.data.viewModels.Espetaculo;
+import server.model.data.viewModels.Lugar;
+import server.model.data.viewModels.Reserva;
 import server.model.jdbc.db.*;
 
 import java.io.*;
@@ -109,7 +112,8 @@ public class ConnDB {
         int linhasAfetadas = statement.executeUpdate(sqlQuery);
         statement.close();
 
-        incrementDBVersion();
+        if(linhasAfetadas > 0)
+            incrementDBVersion();
 
         return linhasAfetadas > 0;
     }
@@ -168,9 +172,11 @@ public class ConnDB {
         ResultSet resultSet = statement.executeQuery(sqlQuery);
 
         while (resultSet.next()) {
-            sb.append(resultSet.getString(TableUtilizador.USERNAME.label)).append(",")
+            sb.append(resultSet.getString(TableUtilizador.ID.label)).append(",")
+                    .append(resultSet.getString(TableUtilizador.USERNAME.label)).append(",")
                     .append(resultSet.getString(TableUtilizador.NOME.label)).append(",")
-                    .append(resultSet.getInt(TableUtilizador.ADMINISTRADOR.label) == 1 ? "admin" : "user");
+                    .append(resultSet.getInt(TableUtilizador.ADMINISTRADOR.label) == 1 ? "admin" : "user")
+                    .append(resultSet.getInt(TableUtilizador.AUTENTICADO.label) == 1 ? "logado" : "não logado");
         }
 
         resultSet.close();
@@ -205,14 +211,14 @@ public class ConnDB {
                 + " WHERE " + TableReserva.ID_ESPETACULO.label + "='" + id + "'"
                 + " AND " + TableReserva.PAGO.label + "='1'";
 
-        if(dbConn.createStatement().executeQuery(sqlQuery).next())
+        if (dbConn.createStatement().executeQuery(sqlQuery).next())
             return false;
 
         // Verificar se existem reservas pagas para este espetáculo
         sqlQuery = "SELECT * FROM " + DatabaseTableNames.RESERVA.label
                 + " WHERE " + TableReserva.ID_ESPETACULO.label + "='" + id + "'";
 
-        ResultSet resultSet =  dbConn.createStatement().executeQuery(sqlQuery);
+        ResultSet resultSet = dbConn.createStatement().executeQuery(sqlQuery);
 
         while (resultSet.next()) {
 
@@ -248,9 +254,18 @@ public class ConnDB {
     public boolean tornarEspetaculoVisivel(int id) throws SQLException {
         Statement statement = dbConn.createStatement();
 
+        String sqlQueryJaVisivel = "SELECT * FROM " + DatabaseTableNames.ESPETACULO.label
+                + " WHERE " + TableEspetaculo.ID.label + "='" + id + "'";
+
+        ResultSet resultSet = dbConn.createStatement().executeQuery(sqlQueryJaVisivel);
+
+        while(resultSet.next())
+            if(resultSet.getInt(TableEspetaculo.VISIVEL.label) == 1)
+                return false;
+
         String sqlQuery = "UPDATE " + DatabaseTableNames.ESPETACULO.label
                 + " SET " + TableEspetaculo.VISIVEL.label + "='1'" +
-                " WHERE " + TableEspetaculo.ID.label + "='" + id +"'";
+                " WHERE " + TableEspetaculo.ID.label + "='" + id + "'";
 
         int rowsAffected = statement.executeUpdate(sqlQuery);
 
@@ -269,12 +284,12 @@ public class ConnDB {
         String sqlQuery = "SELECT * FROM " + DatabaseTableNames.ESPETACULO.label;
 
         if (!filtro.isBlank())
-            sqlQuery += " WHERE (" + TableEspetaculo.DESCRICAO.label + "='" + filtro + "'"
-                    + " OR " + TableEspetaculo.LOCALIDADE.label + "='" + filtro + "'"
-                    + " OR " + TableEspetaculo.TIPO.label + "='" + filtro + "'"
-                    + " OR " + TableEspetaculo.DATA_HORA.label + "='" + filtro + "')";
+            sqlQuery += " WHERE (" + TableEspetaculo.DESCRICAO.label + " LIKE '%" + filtro + "%'"
+                    + " OR " + TableEspetaculo.LOCALIDADE.label + " LIKE '%" + filtro + "%'"
+                    + " OR " + TableEspetaculo.TIPO.label + " LIKE '%" + filtro + "%'"
+                    + " OR " + TableEspetaculo.DATA_HORA.label + " LIKE '%" + filtro + "%')";
 
-        if(!admin) {
+        if (!admin) {
             if (filtro.isBlank())
                 sqlQuery += " WHERE ";
             else
@@ -287,17 +302,10 @@ public class ConnDB {
         ResultSet resultSet = statement.executeQuery(sqlQuery);
 
         while (resultSet.next()) {
-            String sqlQueryLugares = "SELECT "
-                    + DatabaseTableNames.LUGAR.label + "." + TableLugar.ID.label + ", "
-                    + DatabaseTableNames.LUGAR.label + "." + TableLugar.FILA.label + ", "
-                    + DatabaseTableNames.LUGAR.label + "." + TableLugar.ASSENTO.label + ", "
-                    + DatabaseTableNames.LUGAR.label + "." + TableLugar.PRECO.label
-                    + " FROM " + DatabaseTableNames.LUGAR.label
-                    + " INNER JOIN " + DatabaseTableNames.ESPETACULO.label
-                    + " ON " + DatabaseTableNames.LUGAR.label + "." + TableLugar.ESPETACULO_ID.label
-                    + "=" + DatabaseTableNames.ESPETACULO.label + "." + TableEspetaculo.ID.label
-                    + " WHERE " + DatabaseTableNames.ESPETACULO.label + "." + TableEspetaculo.ID.label
-                    + "='" + resultSet.getInt(TableEspetaculo.ID.label) + "'";
+            String sqlQueryLugares = "SELECT * FROM " + DatabaseTableNames.LUGAR.label
+                    + " WHERE " + TableLugar.ESPETACULO_ID.label + "='"
+                    + resultSet.getInt(TableEspetaculo.ID.label) + "'";
+
             ResultSet resultSetLugares = dbConn.createStatement().executeQuery(sqlQueryLugares);
 
             List<Lugar> lugares = new ArrayList<>();
@@ -312,13 +320,12 @@ public class ConnDB {
                 lugares.add(lugar);
             }
 
-            SimpleDateFormat formatterDate=new SimpleDateFormat(Constants.DATE_FORMAT, Locale.ENGLISH);
             espetaculo = new Espetaculo(
                     resultSet.getInt(TableEspetaculo.ID.label),
                     resultSet.getInt(TableEspetaculo.VISIVEL.label) == 1,
                     resultSet.getString(TableEspetaculo.DESCRICAO.label),
                     resultSet.getString(TableEspetaculo.TIPO.label),
-                    formatterDate.parse(resultSet.getString(TableEspetaculo.DATA_HORA.label)),
+                    Constants.formatterDate.parse(resultSet.getString(TableEspetaculo.DATA_HORA.label)),
                     resultSet.getInt(TableEspetaculo.DURACAO.label),
                     resultSet.getString(TableEspetaculo.LOCAL.label),
                     resultSet.getString(TableEspetaculo.LOCALIDADE.label),
@@ -335,7 +342,7 @@ public class ConnDB {
         return espetaculos;
     }
 
-    public Espetaculo getEspetaculo(int id) throws SQLException {
+    public Espetaculo getEspetaculo(int id) throws SQLException, ParseException {
 
         Espetaculo espetaculo = null;
 
@@ -346,18 +353,10 @@ public class ConnDB {
         ResultSet resultSet = statement.executeQuery(sqlQuery);
 
         while (resultSet.next()) {
-            String sqlQueryLugares = "SELECT "
-                    + DatabaseTableNames.LUGAR.label + "." + TableLugar.ID.label + ", "
-                    + DatabaseTableNames.LUGAR.label + "." + TableLugar.FILA.label + ", "
-                    + DatabaseTableNames.LUGAR.label + "." + TableLugar.ASSENTO.label + ", "
-                    + DatabaseTableNames.LUGAR.label + "." + TableLugar.PRECO.label
-                    + " FROM " + DatabaseTableNames.LUGAR.label
-                    + " INNER JOIN " + DatabaseTableNames.ESPETACULO.label
-                    + " ON " + DatabaseTableNames.LUGAR.label + "." + TableLugar.ESPETACULO_ID.label
-                    + "=" + DatabaseTableNames.ESPETACULO.label + "." + TableEspetaculo.ID.label
-                    + " WHERE " + DatabaseTableNames.ESPETACULO.label + "." + TableEspetaculo.ID.label
-                    + "='" + resultSet.getInt(TableEspetaculo.ID.label) + "'";
-            ResultSet resultSetLugares = statement.executeQuery(sqlQueryLugares);
+            String sqlQueryLugares = "SELECT * FROM " + DatabaseTableNames.LUGAR.label
+                    + " WHERE " + TableLugar.ESPETACULO_ID.label + "='"
+                    + resultSet.getInt(TableEspetaculo.ID.label) + "'";
+            ResultSet resultSetLugares = dbConn.createStatement().executeQuery(sqlQueryLugares);
 
             List<Lugar> lugares = new ArrayList<>();
 
@@ -376,7 +375,7 @@ public class ConnDB {
                     resultSet.getInt(TableEspetaculo.VISIVEL.label) == 1,
                     resultSet.getString(TableEspetaculo.DESCRICAO.label),
                     resultSet.getString(TableEspetaculo.TIPO.label),
-                    new Date(resultSet.getString(TableEspetaculo.DATA_HORA.label)),
+                    Constants.formatterDate.parse(resultSet.getString(TableEspetaculo.DATA_HORA.label)),
                     resultSet.getInt(TableEspetaculo.DURACAO.label),
                     resultSet.getString(TableEspetaculo.LOCAL.label),
                     resultSet.getString(TableEspetaculo.LOCALIDADE.label),
@@ -413,9 +412,18 @@ public class ConnDB {
     public boolean pagarReserva(int id) throws SQLException {
         Statement statement = dbConn.createStatement();
 
+        String sqlQueryVerificaPago = "SELECT * FROM " + DatabaseTableNames.RESERVA.label
+                + " WHERE " + TableReserva.ID.label + "='" + id + "'";
+
+        ResultSet resultSet = dbConn.createStatement().executeQuery(sqlQueryVerificaPago);
+
+        while(resultSet.next())
+            if(resultSet.getInt(TableReserva.PAGO.label) == 1)
+                return false;
+
         String sqlQuery = "UPDATE " + DatabaseTableNames.RESERVA.label
-                + " SET " + TableReserva.PAGO.label + "='" + 1
-                + "' WHERE " + TableReserva.ID.label + "=" + id;
+                + " SET " + TableReserva.PAGO.label + "='1'"
+                + " WHERE " + TableReserva.ID.label + "='" + id + "'";
         statement.executeUpdate(sqlQuery);
         statement.close();
 
@@ -427,94 +435,91 @@ public class ConnDB {
     public boolean eliminarReserva(int id) throws SQLException {
         Statement statement = dbConn.createStatement();
 
-        String sqlQuery = "SELECT " + TableReserva.PAGO.label
-                + " FROM " + DatabaseTableNames.RESERVA.label
-                + " WHERE " + TableReserva.ID.label + "=" + id;
-        statement.executeQuery(sqlQuery);
+        String sqlQuery = "SELECT * FROM " + DatabaseTableNames.RESERVA.label
+                + " WHERE " + TableReserva.ID.label + "='" + id + "'";
 
         ResultSet resultSet = statement.executeQuery(sqlQuery);
 
         while (resultSet.next()) {
             if (resultSet.getInt(TableReserva.PAGO.label) == 1) // Reserva paga
                 return false;
-        }
-        sqlQuery = "DELETE * FROM " + DatabaseTableNames.RESERVA.label
-                + " WHERE " + TableReserva.ID.label + "='" + id + "'";
-        statement.executeUpdate(sqlQuery);
 
+            sqlQuery = "DELETE FROM " + DatabaseTableNames.RESERVA_LUGAR
+                    + " WHERE " + TableReservaLugar.ID_RESERVA.label + "='" + id + "'";
+
+            dbConn.createStatement().executeUpdate(sqlQuery);
+
+            sqlQuery = "DELETE FROM " + DatabaseTableNames.RESERVA.label
+                    + " WHERE " + TableReserva.ID.label + "='" + id + "'";
+
+            dbConn.createStatement().executeUpdate(sqlQuery);
+        }
         statement.close();
+
         incrementDBVersion();
 
         return true;
     }
 
-    public List<Reserva> getReservas(boolean pago) throws SQLException {
+    public List<Reserva> getReservas(boolean pago, String username) throws SQLException, ParseException {
 
         List<Reserva> reservas = new ArrayList<>();
-        Reserva reserva = null;
+        Reserva reserva;
         Statement statement = dbConn.createStatement();
 
+        int reservaPaga = pago ? 1 : 0;
+
+        String[] user = getUserInformation(username).split(",");
+
         String sqlQuery = "SELECT * FROM " + DatabaseTableNames.RESERVA.label
-                + " WHERE " + TableReserva.PAGO.label + "=" + pago;
-        statement.executeQuery(sqlQuery);
+                + " WHERE " + TableReserva.PAGO.label + "='" + reservaPaga + "'"
+                + " AND " + TableReserva.ID_UTILIZADOR + "='" + user[0] + "'";
 
         ResultSet resultSet = statement.executeQuery(sqlQuery);
 
         while (resultSet.next()) {
-            String sqlQueryUsername = "SELECT "
-                    + DatabaseTableNames.UTILIZADOR.label + "." + TableUtilizador.USERNAME.label
-                    + " FROM " + DatabaseTableNames.UTILIZADOR.label
-                    + " INNER JOIN " + DatabaseTableNames.RESERVA.label
-                    + " ON " + DatabaseTableNames.RESERVA.label + "." + TableReserva.ID_UTILIZADOR.label
-                    + "=" + DatabaseTableNames.UTILIZADOR.label + "." + TableUtilizador.ID.label
-                    + " WHERE " + DatabaseTableNames.RESERVA.label + "." + TableReserva.ID.label
-                    + "='" + resultSet.getInt(TableReserva.ID.label) + "'";
-            ResultSet resultSetUsername = statement.executeQuery(sqlQueryUsername);
+
+            int idReserva = resultSet.getInt(TableReserva.ID.label);
 
             String sqlQueryEspetaculo = "SELECT * FROM " + DatabaseTableNames.ESPETACULO.label
-                    + " INNER JOIN " + DatabaseTableNames.RESERVA.label
-                    + " ON " + DatabaseTableNames.RESERVA.label + "." + TableReserva.ID_ESPETACULO.label
-                    + "=" + DatabaseTableNames.ESPETACULO.label + "." + TableEspetaculo.ID.label
-                    + " WHERE " + DatabaseTableNames.RESERVA.label + "." + TableReserva.ID.label
-                    + "='" + resultSet.getInt(TableReserva.ID.label) + "'";
+                    + " WHERE " + TableEspetaculo.ID.label + "='" + idReserva + "'";
 
-            ResultSet resultSetEspetaculo = statement.executeQuery(sqlQueryEspetaculo);
+            ResultSet resultSetEspetaculo = dbConn.createStatement().executeQuery(sqlQueryEspetaculo);
 
             Espetaculo espetaculo = getEspetaculo(resultSetEspetaculo.getInt("id"));
 
-            String sqlQueryLugares = "SELECT "
-                    + DatabaseTableNames.LUGAR.label + "." + TableLugar.ID.label + ", "
-                    + DatabaseTableNames.LUGAR.label + "." + TableLugar.FILA.label + ", "
-                    + DatabaseTableNames.LUGAR.label + "." + TableLugar.ASSENTO.label + ", "
-                    + DatabaseTableNames.LUGAR.label + "." + TableLugar.PRECO.label
-                    + " FROM " + DatabaseTableNames.LUGAR.label
-                    + " INNER JOIN " + DatabaseTableNames.RESERVA_LUGAR.label
-                    + " ON " + DatabaseTableNames.LUGAR.label + "." + TableLugar.ID.label
-                    + "=" + DatabaseTableNames.RESERVA_LUGAR.label + "." + TableReservaLugar.ID_LUGAR
-                    + "WHERE " + DatabaseTableNames.RESERVA_LUGAR.label + "." + TableReservaLugar.ID_RESERVA
-                    + "='" + resultSet.getInt(TableReserva.ID.label) + "'";
+            String sqlQueryIdLugaresReserva = "SELECT * FROM " + DatabaseTableNames.RESERVA_LUGAR.label
+                    + " WHERE " + TableReservaLugar.ID_RESERVA.label + "='" + idReserva + "'";
 
-            ResultSet resultSetLugares = statement.executeQuery(sqlQueryLugares);
+            ResultSet resultSetIdLugaresReserva = dbConn.createStatement().executeQuery(sqlQueryIdLugaresReserva);
 
             List<Lugar> lugares = new ArrayList<>();
+            while (resultSetIdLugaresReserva.next()){
 
-            while (resultSetLugares.next()) {
-                Lugar lugar = new Lugar(
-                        resultSetLugares.getInt(TableLugar.ID.label),
-                        resultSetLugares.getString(TableLugar.FILA.label),
-                        resultSetLugares.getString(TableLugar.ASSENTO.label),
-                        resultSetLugares.getDouble(TableLugar.PRECO.label)
-                );
-                lugares.add(lugar);
+                String sqlQueryLugares = "SELECT * FROM " + DatabaseTableNames.LUGAR.label
+                        + " WHERE " + TableLugar.ID.label
+                        + "='" + resultSetIdLugaresReserva.getInt(TableReservaLugar.ID_LUGAR.label) + "'";
+
+                ResultSet resultSetLugares = dbConn.createStatement().executeQuery(sqlQueryLugares);
+
+                while (resultSetLugares.next()) {
+                    Lugar lugar = new Lugar(
+                            resultSetLugares.getInt(TableLugar.ID.label),
+                            resultSetLugares.getString(TableLugar.FILA.label),
+                            resultSetLugares.getString(TableLugar.ASSENTO.label),
+                            resultSetLugares.getDouble(TableLugar.PRECO.label)
+                    );
+                    lugares.add(lugar);
+                }
             }
 
             reserva = new Reserva(
-                    resultSet.getInt(TableReserva.ID.label),
-                    resultSetUsername.getString(TableUtilizador.USERNAME.label),
+                    idReserva,
+                    username,
                     espetaculo,
                     lugares,
                     resultSet.getBoolean(TableReserva.PAGO.label),
-                    new Date()
+                    Constants.formatterDate.parse(resultSet.getString(TableReserva.DATA_HORA.label))
             );
             reservas.add(reserva);
         }

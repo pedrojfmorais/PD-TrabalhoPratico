@@ -9,13 +9,14 @@ import server.model.data.TCP.MessagesTCPOperation;
 import server.model.data.TCP.MsgTcp;
 import server.model.data.TCP.ServerTCPConnection;
 import server.model.data.TCP.TypeMsgTCP;
+import server.model.data.viewModels.Espetaculo;
+import server.model.data.viewModels.Reserva;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.net.SocketException;
-import java.sql.SQLOutput;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -130,11 +131,28 @@ public class ThreadTCPWithServer extends Thread {
                 else
                     ClientUI.showMessage("Erro a eliminar o espetaculo", false);
             }
-            case CLIENT_SERVER_EDITAR_ESPETACULO -> {
+            case CLIENT_SERVER_TORNAR_ESPETACULO_VISIVEL -> {
                 if (msg.getMsg().get(0) instanceof Boolean b && b)
                     ClientUI.showMessage("Espetaculo está visivel", false);
                 else
-                    ClientUI.showMessage("Espetaculo não existe", false);
+                    ClientUI.showMessage("Espetaculo não existe ou já está visivel", false);
+            }
+            case CLIENT_SERVER_MOSTRAR_RESERVAS ->{
+                List<Reserva> reservas = (List<Reserva>) msg.getMsg().get(0);
+                for (var reserva : reservas)
+                    ClientUI.showMessage(reserva + System.lineSeparator(), true);
+            }
+            case CLIENT_SERVER_PAGAR_RESERVA -> {
+                if (msg.getMsg().get(0) instanceof Boolean b && b)
+                    ClientUI.showMessage("Reserva foi paga", false);
+                else
+                    ClientUI.showMessage("Reserva não existe ou já está paga", false);
+            }
+            case CLIENT_SERVER_ELIMINAR_RESERVA -> {
+                if (msg.getMsg().get(0) instanceof Boolean b && b)
+                    ClientUI.showMessage("Reserva foi removida", false);
+                else
+                    ClientUI.showMessage("Reserva não existe ou já foi paga", false);
             }
         }
     }

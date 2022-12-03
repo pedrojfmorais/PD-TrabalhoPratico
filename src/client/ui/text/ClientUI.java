@@ -9,21 +9,23 @@ public class ClientUI {
 
     ClientContext fsm;
 
-    public ClientUI(ClientContext fsm){this.fsm = fsm;}
+    public ClientUI(ClientContext fsm) {
+        this.fsm = fsm;
+    }
 
     private boolean finish = false;
 
-    public static void showMessage(String msg, boolean atualizar){
+    public static void showMessage(String msg, boolean atualizar) {
         System.out.println("\n!!!" + msg + "!!!\n");
-        if(atualizar)
+        if (atualizar)
             System.out.println("Clique enter para atualizar a consola!\n");
     }
 
     public void start() throws IOException, ClassNotFoundException {
-        while (!finish){
-            switch (fsm.getState()){
+        while (!finish) {
+            switch (fsm.getState()) {
                 case NO_SERVER_CONNECTED -> {
-                    if(!fsm.tryConnectToServer()) {
+                    if (!fsm.tryConnectToServer()) {
                         System.out.println("Não foi possivel encontrar nenhum servidor ativo!");
                         finish = true;
                     }
@@ -37,7 +39,7 @@ public class ClientUI {
     }
 
     private void inicioUI() {
-        switch (PAInput.chooseOption("Bem vindo! \n", "Login", "Registar", "Sair")){
+        switch (PAInput.chooseOption("Bem vindo! \n", "Login", "Registar", "Sair")) {
             case 1 -> fsm.login(
                     PAInput.readString("Insira o username: ", true),
                     PAInput.readString("Insira a password: ", false)
@@ -54,12 +56,12 @@ public class ClientUI {
     }
 
     private void consultaPesquisaEspetaculosUI() {
-        switch (fsm.getData().getUser().getStatus()){
+        switch (fsm.getData().getUser().getStatus()) {
 
             case SUCCESSFUL_NORMAL_USER -> {
                 switch (PAInput.chooseOption("Pesquisa e Consulta de Espetaculo",
                         "Pesquisar", "Editar dados conta utilizador",
-                        "Ver Minhas Reservas", "Logout")){
+                        "Ver Minhas Reservas", "Logout")) {
                     case 1 -> fsm.pesquisaEspetaculos(
                             PAInput.readString("Insira o filtro a procurar: ", false, true)
                     );
@@ -75,7 +77,7 @@ public class ClientUI {
             case SUCCESSFUL_ADMIN_USER -> {
                 switch (PAInput.chooseOption("Pesquisa e Consulta de Espetaculo",
                         "Inserir Espetaculo", "Remover Espetaculo", "Tornar Espetaculo Visivel",
-                        "Pesquisar", "Editar dados conta utilizador", "Logout")){
+                        "Pesquisar", "Editar dados conta utilizador", "Logout")) {
                     case 1 -> {
                         //TODO: Mais logo
                     }
@@ -100,7 +102,20 @@ public class ClientUI {
     }
 
     private void minhasReservasUI() {
-        System.out.println("QUALQUER COISA");
+        switch (PAInput.chooseOption("Minhas Reservas",
+                "Ver Reservas Pagas", "Ver Reservas Por Pagar", "Pagar Reserva",
+                "Remover Reserva Não Paga", "Voltar")) {
+            case 1 -> fsm.consultarReservas(true);
+            case 2 -> fsm.consultarReservas(false);
+            case 3 -> fsm.pagarReserva(
+                    PAInput.readLong("Insira o ID da Reserva a pagar: ")
+            );
+            case 4 -> fsm.removerReserva(
+                    PAInput.readLong("Insira o ID da Reserva a remover: ")
+            );
+            case 5 -> fsm.voltarConsultaPesquisaEspetaculos();
+
+        }
     }
 
     private void selecionaEspetaculoUI() {

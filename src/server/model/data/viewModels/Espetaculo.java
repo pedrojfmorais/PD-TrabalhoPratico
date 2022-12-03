@@ -1,4 +1,6 @@
-package server.model.data;
+package server.model.data.viewModels;
+
+import server.model.data.Constants;
 
 import java.io.Serializable;
 import java.util.List;
@@ -83,12 +85,13 @@ public class Espetaculo implements Serializable {
         StringBuilder sb = new StringBuilder();
         sb.append("ID: ").append(id).append(System.lineSeparator());
         sb.append("Designação: ").append(designacao).append(System.lineSeparator());
-        sb.append("Data: ").append(data.toString()).append(System.lineSeparator());
+        sb.append("Data: ").append(Constants.formatterDate.format(data)).append(System.lineSeparator());
         sb.append("Duracao: ").append(duracao).append(System.lineSeparator());
         sb.append("Local: ").append(local).append(System.lineSeparator());
         sb.append("Localidade: ").append(localidade).append(System.lineSeparator());
         sb.append("Pais: ").append(pais).append(System.lineSeparator());
         sb.append("Classificação: ").append(classificacao).append(System.lineSeparator());
+        sb.append("Visivel: ").append(visibilidade ? "Sim" : "Não").append(System.lineSeparator());
         sb.append("Lugares:").append(System.lineSeparator());
         for(var lugar : lugares)
             sb.append(" ->").append(lugar).append(System.lineSeparator());

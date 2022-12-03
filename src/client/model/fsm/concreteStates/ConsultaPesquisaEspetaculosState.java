@@ -7,6 +7,8 @@ import server.model.data.*;
 import server.model.data.TCP.MessagesTCPOperation;
 import server.model.data.TCP.MsgTcp;
 import server.model.data.TCP.TypeMsgTCP;
+import server.model.data.viewModels.Espetaculo;
+import server.model.data.viewModels.Lugar;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -205,7 +207,7 @@ public class ConsultaPesquisaEspetaculosState extends ClientAdapter {
             data.getTcpConnection().sendMsg(
                     new MsgTcp(
                             TypeMsgTCP.CLIENT,
-                            MessagesTCPOperation.CLIENT_SERVER_EDITAR_ESPETACULO,
+                            MessagesTCPOperation.CLIENT_SERVER_TORNAR_ESPETACULO_VISIVEL,
                             List.of(id))
             );
         } catch (IOException | ClassNotFoundException e) {

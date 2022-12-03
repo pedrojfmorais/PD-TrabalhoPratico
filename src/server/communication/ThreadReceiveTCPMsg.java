@@ -5,6 +5,8 @@ import server.model.data.TCP.MessagesTCPOperation;
 import server.model.data.TCP.MsgTcp;
 import server.model.data.TCP.TypeMsgTCP;
 import server.model.data.*;
+import server.model.data.viewModels.Espetaculo;
+import server.model.data.viewModels.Reserva;
 import server.model.jdbc.ConnDB;
 
 import java.io.EOFException;
@@ -196,7 +198,7 @@ public class ThreadReceiveTCPMsg extends Thread {
                         )
                 );
             }
-            case CLIENT_SERVER_EDITAR_ESPETACULO -> {
+            case CLIENT_SERVER_TORNAR_ESPETACULO_VISIVEL -> {
                 boolean result = false;
                 int id = (int) msg.getMsg().get(0);
                 if (connDB.verifyEspetaculoExists(id))
@@ -205,7 +207,7 @@ public class ThreadReceiveTCPMsg extends Thread {
                 sendMsg(
                         new MsgTcp(
                                 TypeMsgTCP.REPLY_SERVER,
-                                MessagesTCPOperation.CLIENT_SERVER_EDITAR_ESPETACULO,
+                                MessagesTCPOperation.CLIENT_SERVER_TORNAR_ESPETACULO_VISIVEL,
                                 List.of(result)
                         )
                 );
@@ -265,7 +267,17 @@ public class ThreadReceiveTCPMsg extends Thread {
             case CLIENT_SERVER_MOSTRAR_RESERVAS -> {
                 boolean reservaPaga = (boolean) msg.getMsg().get(0);
 
-                List<Reserva> reservas = new ArrayList<>(connDB.getReservas(reservaPaga));
+                List<Reserva> reservas;
+                try {
+                    reservas = new ArrayList<>(
+                            connDB.getReservas(
+                                    reservaPaga,
+                                    (String) msg.getMsg().get(1)
+                            )
+                    );
+                } catch (ParseException e) {
+                    throw new RuntimeException(e);
+                }
 
                 sendMsg(
                         new MsgTcp(
@@ -278,12 +290,12 @@ public class ThreadReceiveTCPMsg extends Thread {
         }
     }
 
-    public void sendMsg(MsgTcp msgSend){
+    public void sendMsg(MsgTcp msgSend) {
         try {
             oos.reset();
             oos.writeUnshared(msgSend);
 
-        } catch (SocketException | EOFException ignored){
+        } catch (SocketException | EOFException ignored) {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

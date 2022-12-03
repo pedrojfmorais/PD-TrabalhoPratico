@@ -52,6 +52,10 @@ public class ClientContext {
 
     public void tornarEspetaculoVisivel(long id){state.tornarEspetaculoVisivel(Math.toIntExact(id));}
     public void minhasReservas(){state.minhasReservas();}
+    public void consultarReservas(boolean pagas){state.mostrarReservas(pagas);}
+    public void voltarConsultaPesquisaEspetaculos(){state.voltarPesquisaEspetaculos();}
+    public void pagarReserva(long id){state.pagarReserva(Math.toIntExact(id));}
+    public void removerReserva(long id){state.eliminarReservaNaoPaga(Math.toIntExact(id));}
 
     //TODO: tudo
 

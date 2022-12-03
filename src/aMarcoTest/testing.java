@@ -1,6 +1,6 @@
 package aMarcoTest;
 
-import server.model.data.*;
+import server.model.data.viewModels.Lugar;
 
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
