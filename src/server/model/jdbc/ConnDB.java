@@ -112,7 +112,7 @@ public class ConnDB {
         int linhasAfetadas = statement.executeUpdate(sqlQuery);
         statement.close();
 
-        if(linhasAfetadas > 0)
+        if (linhasAfetadas > 0)
             incrementDBVersion();
 
         return linhasAfetadas > 0;
@@ -129,17 +129,52 @@ public class ConnDB {
         ResultSet resultSet = statement.executeQuery(sqlQuery);
 
         while (resultSet.next()) {
-            //TODO: meter autenticado na bd a 1
+
+            if (resultSet.getInt(TableUtilizador.AUTENTICADO.label) == 1)
+                return LoginStatus.USER_ALREADY_LOGGED_IN;
+
+            String sqlQueryLogado = "UPDATE " + DatabaseTableNames.UTILIZADOR.label
+                    + " SET " + TableUtilizador.AUTENTICADO.label + "='1'" +
+                    " WHERE " + TableUtilizador.USERNAME.label + "='" + username + "'";
+
+            dbConn.createStatement().executeUpdate(sqlQueryLogado);
+
             if (resultSet.getInt(TableUtilizador.ADMINISTRADOR.label) == 1)
                 result = LoginStatus.SUCCESSFUL_ADMIN_USER;
             else
                 result = LoginStatus.SUCCESSFUL_NORMAL_USER;
+
+            incrementDBVersion();
         }
 
         resultSet.close();
         statement.close();
 
         return result;
+    }
+
+    public void logout(String username) throws SQLException {
+
+        String sqlQuery = "SELECT * FROM " + DatabaseTableNames.UTILIZADOR.label
+                + " WHERE " + TableUtilizador.USERNAME.label + "='" + username + "'";
+
+        ResultSet resultSet = dbConn.createStatement().executeQuery(sqlQuery);
+
+        while (resultSet.next()) {
+
+            if (resultSet.getInt(TableUtilizador.AUTENTICADO.label) == 0)
+                return;
+
+            String sqlQueryLogado = "UPDATE " + DatabaseTableNames.UTILIZADOR.label
+                    + " SET " + TableUtilizador.AUTENTICADO.label + "='0'" +
+                    " WHERE " + TableUtilizador.USERNAME.label + "='" + username + "'";
+
+            dbConn.createStatement().executeUpdate(sqlQueryLogado);
+
+            incrementDBVersion();
+        }
+
+        resultSet.close();
     }
 
     public boolean verifyUserExists(String username, String nome) throws SQLException {
@@ -259,8 +294,8 @@ public class ConnDB {
 
         ResultSet resultSet = dbConn.createStatement().executeQuery(sqlQueryJaVisivel);
 
-        while(resultSet.next())
-            if(resultSet.getInt(TableEspetaculo.VISIVEL.label) == 1)
+        while (resultSet.next())
+            if (resultSet.getInt(TableEspetaculo.VISIVEL.label) == 1)
                 return false;
 
         String sqlQuery = "UPDATE " + DatabaseTableNames.ESPETACULO.label
@@ -417,8 +452,8 @@ public class ConnDB {
 
         ResultSet resultSet = dbConn.createStatement().executeQuery(sqlQueryVerificaPago);
 
-        while(resultSet.next())
-            if(resultSet.getInt(TableReserva.PAGO.label) == 1)
+        while (resultSet.next())
+            if (resultSet.getInt(TableReserva.PAGO.label) == 1)
                 return false;
 
         String sqlQuery = "UPDATE " + DatabaseTableNames.RESERVA.label
@@ -494,7 +529,7 @@ public class ConnDB {
             ResultSet resultSetIdLugaresReserva = dbConn.createStatement().executeQuery(sqlQueryIdLugaresReserva);
 
             List<Lugar> lugares = new ArrayList<>();
-            while (resultSetIdLugaresReserva.next()){
+            while (resultSetIdLugaresReserva.next()) {
 
                 String sqlQueryLugares = "SELECT * FROM " + DatabaseTableNames.LUGAR.label
                         + " WHERE " + TableLugar.ID.label

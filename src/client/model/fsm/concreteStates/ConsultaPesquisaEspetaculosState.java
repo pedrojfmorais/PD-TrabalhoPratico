@@ -270,8 +270,22 @@ public class ConsultaPesquisaEspetaculosState extends ClientAdapter {
 
     @Override
     public boolean logout() {
+        try {
+
+            data.getTcpConnection().sendMsg(
+                    new MsgTcp(
+                            TypeMsgTCP.CLIENT,
+                            MessagesTCPOperation.CLIENT_SERVER_LOGOUT,
+                            List.of(data.getUser().getUsername())
+                    )
+            );
+        } catch (IOException | ClassNotFoundException e) {
+            throw new RuntimeException(e);
+        }
+
         data.getUser().setStatus(LoginStatus.WRONG_CREDENTIALS);
         data.getUser().setUsername(null);
+
         changeState(ClientState.INICIO);
         return true;
     }

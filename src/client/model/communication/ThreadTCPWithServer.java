@@ -94,6 +94,8 @@ public class ThreadTCPWithServer extends Thread {
                             fsm.getData().getUser().setUsername(null);
                         }
                         ClientUI.showMessage("Credenciais Incorretas", false);
+                    } else if (ls == LoginStatus.USER_ALREADY_LOGGED_IN) {
+                        ClientUI.showMessage("Utilizador já se encontra autenticado noutra aplicação", false);
                     } else {
                         if (msg.getMsg().get(1) instanceof String username) {
                             synchronized (fsm) {
@@ -137,7 +139,7 @@ public class ThreadTCPWithServer extends Thread {
                 else
                     ClientUI.showMessage("Espetaculo não existe ou já está visivel", false);
             }
-            case CLIENT_SERVER_MOSTRAR_RESERVAS ->{
+            case CLIENT_SERVER_MOSTRAR_RESERVAS -> {
                 List<Reserva> reservas = (List<Reserva>) msg.getMsg().get(0);
                 for (var reserva : reservas)
                     ClientUI.showMessage(reserva + System.lineSeparator(), true);

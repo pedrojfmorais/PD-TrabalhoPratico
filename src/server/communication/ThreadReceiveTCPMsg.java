@@ -130,6 +130,11 @@ public class ThreadReceiveTCPMsg extends Thread {
                         )
                 );
             }
+            case CLIENT_SERVER_LOGOUT -> {
+                if (msg.getMsg().get(0) instanceof String username)
+                    connDB.logout(username);
+
+            }
             case CLIENT_SERVER_REGISTER -> {
 
                 boolean insertUser = false;
