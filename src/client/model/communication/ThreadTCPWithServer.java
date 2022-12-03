@@ -5,6 +5,10 @@ import client.model.fsm.ClientState;
 import client.model.fsm.concreteStates.NoServerConnectedState;
 import client.ui.text.ClientUI;
 import server.model.data.*;
+import server.model.data.TCP.MessagesTCPOperation;
+import server.model.data.TCP.MsgTcp;
+import server.model.data.TCP.ServerTCPConnection;
+import server.model.data.TCP.TypeMsgTCP;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -63,13 +67,17 @@ public class ThreadTCPWithServer extends Thread{
         if(msg.getOperation() == MessagesTCPOperation.CLIENT_SERVER_HELLO && msg.getMsg().get(0).equals("SERVER_OK"))
             return;
 
-        if(msg.getMSG_TYPE() == TypeMsgTCP.SERVER_ASYNC
-                && msg.getOperation() == MessagesTCPOperation.SERVER_ASYNC_RESET_CONNECTION){
-
-            listaServidores = msg.getMsg().stream()
-                    .map( object -> (ServerTCPConnection) object)
-                    .collect(Collectors.toList());
-            close();
+        if(msg.getMSG_TYPE() == TypeMsgTCP.SERVER_ASYNC){
+            switch (msg.getOperation()){
+                case SERVER_ASYNC_RESET_CONNECTION -> {
+                    listaServidores = msg.getMsg().stream()
+                            .map(object -> (ServerTCPConnection) object)
+                            .collect(Collectors.toList());
+                    close();
+                }
+                case SERVER_ASYNC_UPDATE_SERVER_LIST ->
+                    listaServidores = (List<ServerTCPConnection>) msg.getMsg().get(0);
+            }
         }
 
         switch (msg.getOperation()){

@@ -1,4 +1,4 @@
-package server.communication;
+package server.model.data.syncDB;
 
 public class Confirm {
     int versionDB;

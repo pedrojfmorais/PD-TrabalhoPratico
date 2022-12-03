@@ -1,6 +1,10 @@
 package server.communication;
 
 import server.model.data.*;
+import server.model.data.TCP.MessagesTCPOperation;
+import server.model.data.TCP.MsgTcp;
+import server.model.data.TCP.ServerTCPConnection;
+import server.model.data.TCP.TypeMsgTCP;
 import server.model.jdbc.ConnDB;
 
 import java.io.IOException;
@@ -49,7 +53,6 @@ public class ThreadVerificaVersaoDB extends Thread {
 
     private void updateDatabase() throws IOException {
 
-        System.out.println("A dar UPDATE");
         synchronized (serverData) {
             serverData.setDISPONIVEL(false);
         }
@@ -68,20 +71,17 @@ public class ThreadVerificaVersaoDB extends Thread {
 
         synchronized (listaClientes) {
             for (var cliente : listaClientes) {
-                try {
-                    cliente.sendMsg(new MsgTcp(
-                            TypeMsgTCP.SERVER_ASYNC,
-                            MessagesTCPOperation.SERVER_ASYNC_RESET_CONNECTION,
-                            List.of(listaServidoresAEnviar)
-                    ));
-                    cliente.close();
+                cliente.sendMsg(new MsgTcp(
+                        TypeMsgTCP.SERVER_ASYNC,
+                        MessagesTCPOperation.SERVER_ASYNC_RESET_CONNECTION,
+                        List.of(listaServidoresAEnviar)
+                ));
+                cliente.close();
 
-                } catch (SocketException ignored) {
-                }
             }
         }
 
-        sendHeartbeat.enviaHeartBeat();
+        ThreadSendHeartbeat.enviaHeartBeat(serverData);
 
         UpdateDatabaseOnStartup udos = new UpdateDatabaseOnStartup(listaServidores, connDB);
         try {
@@ -94,6 +94,7 @@ public class ThreadVerificaVersaoDB extends Thread {
 
         synchronized (serverData) {
             serverData.setDISPONIVEL(true);
+            ThreadSendHeartbeat.enviaHeartBeat(serverData);
         }
     }
 }

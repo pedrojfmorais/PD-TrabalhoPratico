@@ -1,9 +1,9 @@
 package server.communication;
 
 import server.model.data.Heartbeat;
-import server.model.data.MessagesTCPOperation;
-import server.model.data.MsgTcp;
-import server.model.data.TypeMsgTCP;
+import server.model.data.TCP.MessagesTCPOperation;
+import server.model.data.TCP.MsgTcp;
+import server.model.data.TCP.TypeMsgTCP;
 import server.model.jdbc.ConnDB;
 
 import java.io.IOException;

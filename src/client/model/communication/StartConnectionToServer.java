@@ -1,9 +1,9 @@
 package client.model.communication;
 
-import server.model.data.MessagesTCPOperation;
-import server.model.data.MsgTcp;
-import server.model.data.ServerTCPConnection;
-import server.model.data.TypeMsgTCP;
+import server.model.data.TCP.MessagesTCPOperation;
+import server.model.data.TCP.MsgTcp;
+import server.model.data.TCP.ServerTCPConnection;
+import server.model.data.TCP.TypeMsgTCP;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;

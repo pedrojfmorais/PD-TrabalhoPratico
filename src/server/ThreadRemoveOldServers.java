@@ -1,5 +1,6 @@
 package server;
 
+import server.communication.SendListaServidoresClientesTCP;
 import server.model.data.Heartbeat;
 
 import java.util.Date;
@@ -10,9 +11,11 @@ import static server.model.data.Constants.TIMEOUT_REMOVE_OLD_SERVERS_MILLISECOND
 public class ThreadRemoveOldServers extends Thread{
 
     private final List<Heartbeat> listaServidores;
+    private SendListaServidoresClientesTCP atualizaClientes;
 
-    public ThreadRemoveOldServers(List<Heartbeat> listaServidores) {
+    public ThreadRemoveOldServers(List<Heartbeat> listaServidores, SendListaServidoresClientesTCP atualizaClientes) {
         this.listaServidores = listaServidores;
+        this.atualizaClientes = atualizaClientes;
     }
 
     @Override
@@ -31,6 +34,7 @@ public class ThreadRemoveOldServers extends Thread{
                                             > TIMEOUT_REMOVE_OLD_SERVERS_MILLISECONDS)
                                      || !server.isDISPONIVEL());
                 }
+                atualizaClientes.enviarLista();
             }
         } catch (InterruptedException e) {
             throw new RuntimeException(e);

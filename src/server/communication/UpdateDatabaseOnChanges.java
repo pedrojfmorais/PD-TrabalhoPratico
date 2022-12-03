@@ -1,7 +1,8 @@
 package server.communication;
 
 import server.model.data.Heartbeat;
-import server.model.data.MsgTcp;
+import server.model.data.TCP.MsgTcp;
+import server.model.data.syncDB.Prepare;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;

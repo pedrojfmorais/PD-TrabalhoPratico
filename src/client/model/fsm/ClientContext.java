@@ -38,8 +38,6 @@ public class ClientContext {
         state.register(username, nome, password);
     }
 
-    public void exit(){data.exit();}
-
     //TODO: tudo
 
 }

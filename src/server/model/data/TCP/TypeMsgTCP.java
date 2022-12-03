@@ -1,4 +1,4 @@
-package server.model.data;
+package server.model.data.TCP;
 
 public enum TypeMsgTCP {
     CLIENT,

@@ -1,4 +1,4 @@
-package server.model.data;
+package server.model.data.TCP;
 
 public enum MessagesTCPOperation {
 
@@ -8,6 +8,7 @@ public enum MessagesTCPOperation {
 
     //SERVER_ASYNC
     SERVER_ASYNC_RESET_CONNECTION,
+    SERVER_ASYNC_UPDATE_SERVER_LIST,
 
     //CLIENT and REPLY_SERVER
     CLIENT_SERVER_HELLO,

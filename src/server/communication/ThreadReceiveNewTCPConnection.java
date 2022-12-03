@@ -13,15 +13,20 @@ public class ThreadReceiveNewTCPConnection extends Thread{
 
     private final List<Thread> listThreadsTCPConnections;
     private final List<ThreadReceiveTCPMsg> listaClientes;
-    private final Heartbeat heartbeat;
+    private SendListaServidoresClientesTCP atualizaClientes;
+    private final Heartbeat serverData;
     private ServerSocket ss;
     private final ConnDB connDB;
 
-    public ThreadReceiveNewTCPConnection(Heartbeat heartbeat, List<ThreadReceiveTCPMsg> listaClientes, ConnDB connDB) {
-        this.heartbeat = heartbeat;
+    public ThreadReceiveNewTCPConnection(Heartbeat serverData, List<ThreadReceiveTCPMsg> listaClientes,
+                                         ConnDB connDB, SendListaServidoresClientesTCP atualizaClientes) {
+        this.serverData = serverData;
         this.listaClientes = listaClientes;
         this.connDB = connDB;
+        this.atualizaClientes = atualizaClientes;
+
         listThreadsTCPConnections = new ArrayList<>();
+
     }
 
     @Override
@@ -31,23 +36,30 @@ public class ThreadReceiveNewTCPConnection extends Thread{
 
             ss = new ServerSocket(0);
 
-            synchronized (heartbeat){
-                heartbeat.setTCP_PORT(ss.getLocalPort());
+            synchronized (serverData){
+                serverData.setTCP_PORT(ss.getLocalPort());
             }
 
             while(true) {
 
                 Socket cliSocket = ss.accept();
 
-                ThreadReceiveTCPMsg t = new ThreadReceiveTCPMsg(cliSocket, connDB, heartbeat);
+                ThreadReceiveTCPMsg t = new ThreadReceiveTCPMsg(cliSocket, connDB, serverData, atualizaClientes);
                 t.start();
 
                 synchronized (listaClientes) {
+                    listaClientes.removeIf(cliente -> !cliente.isAlive());
                     listaClientes.add(t);
                 }
                 synchronized (listThreadsTCPConnections) {
+                    listThreadsTCPConnections.removeIf(cliente -> !cliente.isAlive());
                     listThreadsTCPConnections.add(t);
                 }
+                synchronized (serverData){
+                    serverData.setNUMERO_LIGACOES_TCP(serverData.getNUMERO_LIGACOES_TCP() + 1);
+                    ThreadSendHeartbeat.enviaHeartBeat(serverData);
+                }
+                atualizaClientes.enviarLista();
             }
 
         } catch (IOException e) {

@@ -1,6 +1,6 @@
-package server.communication;
+package server.model.data.syncDB;
 
-import server.model.data.MsgTcp;
+import server.model.data.TCP.MsgTcp;
 
 import java.io.Serializable;
 

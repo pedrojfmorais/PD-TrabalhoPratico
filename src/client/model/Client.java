@@ -5,10 +5,12 @@ import client.model.data.User;
 import client.model.fsm.ClientContext;
 import client.ui.text.ClientUI;
 import server.model.data.LoginStatus;
-import server.model.data.ServerTCPConnection;
+import server.model.data.TCP.ServerTCPConnection;
 
+import java.io.EOFException;
 import java.io.IOException;
 import java.net.Socket;
+import java.net.SocketException;
 import java.util.List;
 
 import static client.model.communication.StartConnectionToServer.getActiveServers;
@@ -47,11 +49,14 @@ public class Client {
     public boolean tryConnectToServer() throws IOException {
         ServerTCPConnection serverTCPConnected = null;
         for (var server : listaServidores) {
+            System.out.println(server.getIP() +" "+server.getPORT());
             try {
-                if(testTCPServer(server)){
+                if (testTCPServer(server)) {
                     serverTCPConnected = server;
                     break;
                 }
+            }catch (SocketException | EOFException ignored){
+                System.out.println("aqui");
             } catch (IOException | ClassNotFoundException e) {
                 throw new RuntimeException(e);
             }
@@ -73,13 +78,5 @@ public class Client {
                 true);
 
         return true;
-    }
-
-    public void exit(){
-        try {
-            tcpConnection.close();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
     }
 }

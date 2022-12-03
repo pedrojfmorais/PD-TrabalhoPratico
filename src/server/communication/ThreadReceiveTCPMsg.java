@@ -1,12 +1,13 @@
 package server.communication;
 
 import server.model.data.LoginStatus;
-import server.model.data.MessagesTCPOperation;
-import server.model.data.MsgTcp;
-import server.model.data.TypeMsgTCP;
+import server.model.data.TCP.MessagesTCPOperation;
+import server.model.data.TCP.MsgTcp;
+import server.model.data.TCP.TypeMsgTCP;
 import server.model.data.*;
 import server.model.jdbc.ConnDB;
 
+import java.io.EOFException;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -21,14 +22,17 @@ public class ThreadReceiveTCPMsg extends Thread {
     private final ConnDB connDB;
     private final Socket cliSocket;
     private final Heartbeat serverData;
+    private SendListaServidoresClientesTCP atualizaClientes;
     private final ObjectOutputStream oos;
     private final ObjectInputStream ois;
     private boolean threadContinue = true;
 
-    public ThreadReceiveTCPMsg(Socket cliSocket, ConnDB connDB, Heartbeat serverData) throws IOException {
+    public ThreadReceiveTCPMsg(Socket cliSocket, ConnDB connDB,
+                               Heartbeat serverData, SendListaServidoresClientesTCP atualizaClientes) throws IOException {
         this.cliSocket = cliSocket;
         this.connDB = connDB;
         this.serverData = serverData;
+        this.atualizaClientes = atualizaClientes;
 
         oos = new ObjectOutputStream(cliSocket.getOutputStream());
         ois = new ObjectInputStream(cliSocket.getInputStream());
@@ -41,11 +45,7 @@ public class ThreadReceiveTCPMsg extends Thread {
             MsgTcp msgRec;
             try {
                 msgRec = (MsgTcp) ois.readObject();
-            } catch (SocketException e) {
-                try {
-                    cliSocket.close();
-                } catch (IOException ignored) {
-                }
+            } catch (SocketException | EOFException e) {
                 close();
                 break;
             } catch (IOException | ClassNotFoundException e) {
@@ -53,9 +53,13 @@ public class ThreadReceiveTCPMsg extends Thread {
             }
 
             try {
-
-                tratarMensagem(msgRec);
-                serverData.setLOCAL_DB_VERSION(connDB.getVersionDB());
+                synchronized (connDB) {
+                    tratarMensagem(msgRec);
+                    if (connDB.getVersionDB() != serverData.getLOCAL_DB_VERSION()) {
+                        serverData.setLOCAL_DB_VERSION(connDB.getVersionDB());
+                        ThreadSendHeartbeat.enviaHeartBeat(serverData);
+                    }
+                }
 
             } catch (SQLException | IOException e) {
                 throw new RuntimeException(e);
@@ -67,6 +71,15 @@ public class ThreadReceiveTCPMsg extends Thread {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+        synchronized (serverData) {
+            serverData.setNUMERO_LIGACOES_TCP(serverData.getNUMERO_LIGACOES_TCP() - 1);
+            try {
+                ThreadSendHeartbeat.enviaHeartBeat(serverData);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        atualizaClientes.enviarLista();
     }
 
     public void close() {
@@ -85,7 +98,7 @@ public class ThreadReceiveTCPMsg extends Thread {
         }
     }
 
-    public void tratarMensagemCliente(MsgTcp msg) throws SQLException, IOException {
+    public void tratarMensagemCliente(MsgTcp msg) throws SQLException {
         MessagesTCPOperation operation = msg.getOperation();
         if (operation == MessagesTCPOperation.CLIENT_SERVER_HELLO) {
             sendMsg(new MsgTcp(
@@ -222,8 +235,15 @@ public class ThreadReceiveTCPMsg extends Thread {
         }
     }
 
-    public void sendMsg(MsgTcp msgSend) throws IOException {
-        oos.reset();
-        oos.writeUnshared(msgSend);
+    public void sendMsg(MsgTcp msgSend){
+        try {
+
+            oos.reset();
+            oos.writeUnshared(msgSend);
+
+        } catch (SocketException | EOFException ignored){
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

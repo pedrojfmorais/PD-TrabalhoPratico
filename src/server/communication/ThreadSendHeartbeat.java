@@ -15,11 +15,9 @@ import static server.model.data.Constants.*;
 public class ThreadSendHeartbeat extends Thread{
 
     private final Heartbeat serverData;
-    DatagramSocket ds;
+    static DatagramSocket ds;
 
-    public ThreadSendHeartbeat(Heartbeat serverData) {
-        this.serverData = serverData;
-
+    static {
         try {
             ds = new DatagramSocket();
         } catch (SocketException e) {
@@ -27,12 +25,16 @@ public class ThreadSendHeartbeat extends Thread{
         }
     }
 
+    public ThreadSendHeartbeat(Heartbeat serverData) {
+        this.serverData = serverData;
+    }
+
     @Override
     public void run() {
 
         try {
             while (true) {
-                enviaHeartBeat();
+                enviaHeartBeat(serverData);
                 Thread.sleep(TIMEOUT_HEARTBEAT_MILLISECONDS);
             }
         } catch (IOException | InterruptedException e) {
@@ -41,14 +43,13 @@ public class ThreadSendHeartbeat extends Thread{
 
     }
 
-    protected void enviaHeartBeat() throws IOException {
+    public static void enviaHeartBeat(Heartbeat serverData) throws IOException {
 
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         ObjectOutputStream oos = new ObjectOutputStream(baos);
 
-        synchronized (serverData) {
-            oos.writeObject(serverData);
-        }
+        oos.writeObject(serverData);
+
 
         byte[] msgBytes = baos.toByteArray();
 

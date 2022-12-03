@@ -16,9 +16,11 @@ import static server.model.data.Constants.PORT_MULTICAST;
 public class ThreadReceiveMulticast extends Thread {
 
     private final List<Heartbeat> listaServidores;
+    private SendListaServidoresClientesTCP atualizaClientes;
 
-    public ThreadReceiveMulticast(List<Heartbeat> listaServidores) {
+    public ThreadReceiveMulticast(List<Heartbeat> listaServidores, SendListaServidoresClientesTCP atualizaClientes) {
         this.listaServidores = listaServidores;
+        this.atualizaClientes = atualizaClientes;
     }
 
     @Override
@@ -68,11 +70,15 @@ public class ThreadReceiveMulticast extends Thread {
 
             Collections.sort(listaServidores);
 
+
+
             //TODO: Testing
             for (var a : listaServidores)
-                System.out.println(a.getIpServer() + " " + a.getTCP_PORT());
+                System.out.println(a.getIpServer() + " " + a.getTCP_PORT()
+                        + " " + a.getNUMERO_LIGACOES_TCP() + " " + a.getLOCAL_DB_VERSION());
             System.out.println();
             //TODO: Fim Testing
         }
+        atualizaClientes.enviarLista();
     }
 }

@@ -1,7 +1,7 @@
 package server.communication;
 
 import server.model.data.Heartbeat;
-import server.model.data.ServerTCPConnection;
+import server.model.data.TCP.ServerTCPConnection;
 
 import java.io.*;
 import java.net.DatagramPacket;

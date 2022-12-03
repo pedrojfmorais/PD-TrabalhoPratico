@@ -3,9 +3,9 @@ package client.model.fsm.concreteStates;
 import client.model.Client;
 import client.model.fsm.ClientContext;
 import client.model.fsm.ClientState;
-import server.model.data.MessagesTCPOperation;
-import server.model.data.MsgTcp;
-import server.model.data.TypeMsgTCP;
+import server.model.data.TCP.MessagesTCPOperation;
+import server.model.data.TCP.MsgTcp;
+import server.model.data.TCP.TypeMsgTCP;
 
 import java.io.IOException;
 import java.util.List;

@@ -23,6 +23,8 @@ public class Server {
     private final List<Heartbeat> listaServidores;
     private final List<ThreadReceiveTCPMsg> listaClientes;
 
+    private SendListaServidoresClientesTCP atualizaClientes;
+
     public Server(int udp_port, String db_path){
 
         UDP_PORT = udp_port;
@@ -38,11 +40,12 @@ public class Server {
         listaServidores = new ArrayList<>();
         listaClientes = new ArrayList<>();
         serverData = new Heartbeat(myTCPPort, false, localDbVersion,0);
+        atualizaClientes = new SendListaServidoresClientesTCP(listaServidores, listaClientes);
     }
 
     public void start() throws InterruptedException {
 
-        ThreadReceiveMulticast trm = new ThreadReceiveMulticast(listaServidores);
+        ThreadReceiveMulticast trm = new ThreadReceiveMulticast(listaServidores, atualizaClientes);
         trm.start();
 
         allThreads.add(trm);
@@ -85,7 +88,9 @@ public class Server {
     public void startThreads(){
 
 
-        ThreadReceiveNewTCPConnection trtcpc = new ThreadReceiveNewTCPConnection(serverData, listaClientes, connDB);
+        ThreadReceiveNewTCPConnection trtcpc = new ThreadReceiveNewTCPConnection(
+                serverData, listaClientes, connDB, atualizaClientes
+        );
         trtcpc.start();
 
         allThreads.add(trtcpc);
@@ -95,7 +100,7 @@ public class Server {
 
         allThreads.add(tsh);
 
-        ThreadRemoveOldServers tros = new ThreadRemoveOldServers(listaServidores);
+        ThreadRemoveOldServers tros = new ThreadRemoveOldServers(listaServidores, atualizaClientes);
         tros.start();
 
         allThreads.add(tros);
