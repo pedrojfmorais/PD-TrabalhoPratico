@@ -1,6 +1,7 @@
 package client.model.fsm;
 
 import java.io.IOException;
+import java.util.List;
 
 public interface IClientState {
 
@@ -29,9 +30,9 @@ public interface IClientState {
 
     //SELECIONA_ESPETACULO
     void mostraLugaresDisponiveis();
-    void selecionaLugaresPretendidos(String ... lugares);
+    void selecionaLugaresPretendidos(List<String> lugares);
     void validarReserva();
-    void cancelarReserva(int id);
+    void cancelarReserva();
 
     //Todos
     ClientState getState();

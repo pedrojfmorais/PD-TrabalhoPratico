@@ -3,6 +3,7 @@ package client.model.fsm.concreteStates;
 import client.model.Client;
 import client.model.fsm.ClientContext;
 import client.model.fsm.ClientState;
+import client.ui.text.ClientUI;
 import server.model.data.TCP.MessagesTCPOperation;
 import server.model.data.TCP.MsgTcp;
 import server.model.data.TCP.TypeMsgTCP;
@@ -17,42 +18,19 @@ public class SelecionaEspetaculoState extends ClientAdapter {
 
     @Override
     public void mostraLugaresDisponiveis() {
-        try {
-
-            data.getTcpConnection().sendMsg(
-                    new MsgTcp(
-                            TypeMsgTCP.CLIENT,
-                            MessagesTCPOperation.CLIENT_SERVER_MOSTRA_LUGARES,
-                            null)
-            );
-        } catch (IOException | ClassNotFoundException e) {
-            throw new RuntimeException(e);
-        }
+        for (var lugar : data.getEspetaculoSelecionado().getLugares())
+            if (lugar.isDisponivel())
+                ClientUI.showMessage(lugar.toString(), false);
     }
 
     @Override
-    public void selecionaLugaresPretendidos(String... lugares) {
+    public void selecionaLugaresPretendidos(List<String> lugares) {
         try {
-
             data.getTcpConnection().sendMsg(
                     new MsgTcp(
                             TypeMsgTCP.CLIENT,
                             MessagesTCPOperation.CLIENT_SERVER_SELECIONA_LUGARES,
-                            List.of(lugares))
-            );
-        } catch (IOException | ClassNotFoundException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    public void validarReserva(int id) {
-        try {
-
-            data.getTcpConnection().sendMsg(
-                    new MsgTcp(
-                            TypeMsgTCP.CLIENT,
-                            MessagesTCPOperation.CLIENT_SERVER_VALIDA_RESERVA,
-                            List.of(id))
+                            List.of(data.getUser().getUsername(), data.getEspetaculoSelecionado().getId(), lugares))
             );
         } catch (IOException | ClassNotFoundException e) {
             throw new RuntimeException(e);
@@ -60,18 +38,9 @@ public class SelecionaEspetaculoState extends ClientAdapter {
     }
 
     @Override
-    public void cancelarReserva(int id) {
-        try {
-
-            data.getTcpConnection().sendMsg(
-                    new MsgTcp(
-                            TypeMsgTCP.CLIENT,
-                            MessagesTCPOperation.CLIENT_SERVER_CANCELAR_RESERVA,
-                            List.of(id))
-            );
-        } catch (IOException | ClassNotFoundException e) {
-            throw new RuntimeException(e);
-        }
+    public void cancelarReserva() {
+        data.setEspetaculoSelecionado(null);
+        changeState(ClientState.CONSULTA_PESQUISA_ESPETACULOS);
     }
 
     @Override

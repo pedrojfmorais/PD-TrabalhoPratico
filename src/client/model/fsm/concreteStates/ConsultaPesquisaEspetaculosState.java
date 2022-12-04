@@ -30,39 +30,6 @@ public class ConsultaPesquisaEspetaculosState extends ClientAdapter {
     }
 
     //ADMIN
-    /*@Override
-    public boolean inserirEspetaculo(String filename) {
-
-        if(!isAdminUser())
-            return false;
-
-        try(FileReader fr = new FileReader(filename);
-            BufferedReader br = new BufferedReader(fr)){
-
-            String line;
-            while ((line = br.readLine()) != null) {
-                String[] tokens = line.split(";");
-
-
-
-            }
-
-        } catch (FileNotFoundException e) {
-            throw new RuntimeException(e);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-
-        //Espetaculo(designacao, tipo, data, hora, duracao, local, localidade, pais, classificacao, lugares)
-
-        return true;
-    }*/
-
-    /*
-     * Lugares de erro no exemplo:
-     *  Tipo - Tem um : a separar, em vez de ;
-     *  Repete a fila E e F
-     */
     @Override
     public boolean inserirEspetaculo(String filename) {
         Espetaculo espetaculo = data.readFileEspetaculo(filename);

@@ -7,13 +7,14 @@ public class Lugar implements Serializable {
     private String fila;
     private String assento;
     private double preco;
-    private boolean disponivel = true;
+    private boolean disponivel;
 
-    public Lugar(int id, String fila, String assento, double preco) {
+    public Lugar(int id, String fila, String assento, double preco, boolean disponivel) {
         this.id = id;
         this.fila = fila;
         this.assento = assento;
         this.preco = preco;
+        this.disponivel = disponivel;
     }
 
     public int getId() {

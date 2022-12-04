@@ -30,6 +30,7 @@ public class Client {
 
     ClientContext fsm;
     private final User user;
+    private Espetaculo espetaculoSelecionado;
     ThreadTCPWithServer tcpConnection;
     List<ServerTCPConnection> listaServidores;
     final String IP_SERVER;
@@ -40,6 +41,7 @@ public class Client {
         this.IP_SERVER = IP_SERVER;
         this.PORT_UDP = PORT_UDP;
         this.fsm = fsm;
+        this.espetaculoSelecionado = null;
 
         try {
             listaServidores = getActiveServers(IP_SERVER, PORT_UDP);
@@ -50,6 +52,14 @@ public class Client {
 
     public User getUser() {
         return user;
+    }
+
+    public Espetaculo getEspetaculoSelecionado() {
+        return espetaculoSelecionado;
+    }
+
+    public void setEspetaculoSelecionado(Espetaculo espetaculoSelecionado) {
+        this.espetaculoSelecionado = espetaculoSelecionado;
     }
 
     public ThreadTCPWithServer getTcpConnection() {
@@ -158,7 +168,8 @@ public class Client {
                         // Separate seat from price
                         String[] seat = prepareToSave(tok).split(":");
                         // Create new Lugar
-                        Lugar lugar = new Lugar(0, linePurpose.toUpperCase(), seat[0], Double.parseDouble(seat[1]));
+                        Lugar lugar = new Lugar(0, linePurpose.toUpperCase(),
+                                seat[0], Double.parseDouble(seat[1]), true);
 
                         // If seat has been registered, stop
                         if (lugares.contains(lugar)) {

@@ -162,6 +162,27 @@ public class ThreadTCPWithServer extends Thread {
                 else
                     ClientUI.showMessage("Reserva não existe ou já foi paga", false);
             }
+            case CLIENT_SERVER_SELECIONAR_ESPETACULO -> {
+                if(msg.getMsg()== null) {
+                    ClientUI.showMessage("Espetaculo inexistente ou decorrará em menos de 24 horas", false);
+                }
+
+                else if(msg.getMsg().get(0) instanceof Espetaculo espetaculo){
+                    fsm.getData().setEspetaculoSelecionado(espetaculo);
+                    fsm.changeState(ClientState.SELECIONA_ESPETACULO.createState(fsm, fsm.getData()));
+                    ClientUI.showMessage("", true);
+                }
+            }
+            case CLIENT_SERVER_SELECIONA_LUGARES -> {
+                if (msg.getMsg().get(0) instanceof Boolean b && b) {
+                    ClientUI.showMessage("Reserva criada com sucesso", false);
+                    fsm.changeState(ClientState.MINHAS_RESERVAS.createState(fsm, fsm.getData()));
+                }
+                else {
+                    ClientUI.showMessage("Erro a criar a reserva", false);
+                    fsm.changeState(ClientState.CONSULTA_PESQUISA_ESPETACULOS.createState(fsm, fsm.getData()));
+                }
+            }
         }
     }
 

@@ -3,6 +3,7 @@ package client.model.fsm;
 import client.model.Client;
 
 import java.io.IOException;
+import java.util.List;
 
 public class ClientContext {
 
@@ -59,6 +60,12 @@ public class ClientContext {
     public void voltarConsultaPesquisaEspetaculos(){state.voltarPesquisaEspetaculos();}
     public void pagarReserva(long id){state.pagarReserva(Math.toIntExact(id));}
     public void removerReserva(long id){state.eliminarReservaNaoPaga(Math.toIntExact(id));}
+    public void selecionarEspetaculo(long id){state.selecionarEspetaculo(Math.toIntExact(id));}
+
+    public void mostrarLugaresDisponiveis(){state.mostraLugaresDisponiveis();}
+
+    public void selecionarLugaresReserva(List<String> lugares){state.selecionaLugaresPretendidos(lugares);}
+    public void cancelarReserva(){state.cancelarReserva();}
 
     //TODO: tudo
 

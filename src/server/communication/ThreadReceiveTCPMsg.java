@@ -18,7 +18,10 @@ import java.net.SocketException;
 import java.sql.SQLException;
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 public class ThreadReceiveTCPMsg extends Thread {
 
@@ -190,7 +193,7 @@ public class ThreadReceiveTCPMsg extends Thread {
                 );
             }
             case CLIENT_SERVER_INSERIR_ESPETACULO -> {
-                boolean result = false;
+                boolean result;
                 Espetaculo espetaculo = (Espetaculo) msg.getMsg().get(0);
                 result = connDB.inserirEspetaculo(espetaculo);
 
@@ -231,7 +234,37 @@ public class ThreadReceiveTCPMsg extends Thread {
                 );
             }
             case CLIENT_SERVER_SELECIONAR_ESPETACULO -> {
-                // TODO ???
+                if (msg.getMsg().get(0) instanceof Integer idEspetaculo) {
+                    Espetaculo espetaculo;
+                    try {
+                        espetaculo = connDB.getEspetaculo(idEspetaculo);
+                    } catch (ParseException e) {
+                        throw new RuntimeException(e);
+                    }
+
+                    long diffInMillies = espetaculo.getData().getTime() - new Date().getTime();
+                    long diff = TimeUnit.HOURS.convert(diffInMillies, TimeUnit.MILLISECONDS);
+
+                    if (diff < 24)
+                        espetaculo = null;
+
+                    if (espetaculo != null)
+                        sendMsg(
+                                new MsgTcp(
+                                        TypeMsgTCP.REPLY_SERVER,
+                                        MessagesTCPOperation.CLIENT_SERVER_SELECIONAR_ESPETACULO,
+                                        List.of(espetaculo)
+                                )
+                        );
+                    else
+                        sendMsg(
+                                new MsgTcp(
+                                        TypeMsgTCP.REPLY_SERVER,
+                                        MessagesTCPOperation.CLIENT_SERVER_SELECIONAR_ESPETACULO,
+                                        null
+                                )
+                        );
+                }
             }
             case CLIENT_SERVER_PESQUISA_ESPETACULO -> {
                 if (msg.getMsg().get(0) instanceof String filtro
@@ -304,6 +337,50 @@ public class ThreadReceiveTCPMsg extends Thread {
                                 List.of(reservas)
                         )
                 );
+            }
+            case CLIENT_SERVER_SELECIONA_LUGARES -> {
+
+                if (msg.getMsg().get(0) instanceof String username
+                        && msg.getMsg().get(1) instanceof Integer idEspetaculo
+                        && msg.getMsg().get(2) instanceof List<?> lugares) {
+
+                    String utilizador = connDB.getUserInformation(username);
+                    List<Boolean> resInserirLugar = new ArrayList<>();
+                    int idReserva = 0;
+
+                    if (utilizador != null) {
+                        int idUtilizador = Integer.parseInt(utilizador.split(",")[0]);
+                        idReserva = connDB.criarReserva(idUtilizador, idEspetaculo);
+
+                        if (idReserva != 0) {
+                            for (var lugar : lugares)
+                                if (lugar instanceof String str) {
+                                    String[] dadosLugar = str.split(":");
+
+                                    resInserirLugar.add(
+                                            connDB.selecionarLugar(idReserva, idEspetaculo, dadosLugar[0], dadosLugar[1])
+                                    );
+                                }
+                        }
+                    }
+                    if (utilizador != null && idReserva != 0 && !resInserirLugar.isEmpty()
+                            && resInserirLugar.contains(false) && !resInserirLugar.contains(true))
+                        sendMsg(
+                                new MsgTcp(
+                                        TypeMsgTCP.REPLY_SERVER,
+                                        MessagesTCPOperation.CLIENT_SERVER_SELECIONA_LUGARES,
+                                        List.of(false)
+                                )
+                        );
+                    else
+                        sendMsg(
+                                new MsgTcp(
+                                        TypeMsgTCP.REPLY_SERVER,
+                                        MessagesTCPOperation.CLIENT_SERVER_SELECIONA_LUGARES,
+                                        List.of(true)
+                                )
+                        );
+                }
             }
         }
     }

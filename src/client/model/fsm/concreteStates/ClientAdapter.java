@@ -6,6 +6,7 @@ import client.model.fsm.ClientState;
 import client.model.fsm.IClientState;
 
 import java.io.IOException;
+import java.util.List;
 
 abstract class ClientAdapter implements IClientState{
 
@@ -78,13 +79,13 @@ abstract class ClientAdapter implements IClientState{
     }
 
     @Override
-    public void selecionaLugaresPretendidos(String... lugares) { }
+    public void selecionaLugaresPretendidos(List<String> lugares) { }
 
     @Override
     public void validarReserva() {
     }
 
     @Override
-    public void cancelarReserva(int id) {
+    public void cancelarReserva() {
     }
 }
