@@ -175,7 +175,7 @@ public class ThreadTCPWithServer extends Thread {
             }
             case CLIENT_SERVER_SELECIONA_LUGARES -> {
                 if (msg.getMsg().get(0) instanceof Boolean b && b) {
-                    ClientUI.showMessage("Reserva criada com sucesso", false);
+                    ClientUI.showMessage("Reserva criada com sucesso", true);
                     fsm.changeState(ClientState.MINHAS_RESERVAS.createState(fsm, fsm.getData()));
                 }
                 else {

@@ -66,7 +66,4 @@ public class ClientContext {
 
     public void selecionarLugaresReserva(List<String> lugares){state.selecionaLugaresPretendidos(lugares);}
     public void cancelarReserva(){state.cancelarReserva();}
-
-    //TODO: tudo
-
 }

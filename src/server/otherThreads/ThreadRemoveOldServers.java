@@ -1,4 +1,4 @@
-package server;
+package server.otherThreads;
 
 import server.communication.SendListaServidoresClientesTCP;
 import server.model.data.Heartbeat;

@@ -8,6 +8,7 @@ import server.model.data.*;
 import server.model.data.viewModels.Espetaculo;
 import server.model.data.viewModels.Reserva;
 import server.model.jdbc.ConnDB;
+import server.otherThreads.ThreadPagamentoReserva;
 
 import java.io.EOFException;
 import java.io.IOException;
@@ -363,8 +364,8 @@ public class ThreadReceiveTCPMsg extends Thread {
                                 }
                         }
                     }
-                    if (utilizador != null && idReserva != 0 && !resInserirLugar.isEmpty()
-                            && resInserirLugar.contains(false) && !resInserirLugar.contains(true))
+                    if (utilizador == null || idReserva == 0 || resInserirLugar.isEmpty()
+                            || resInserirLugar.contains(false) && !resInserirLugar.contains(true))
                         sendMsg(
                                 new MsgTcp(
                                         TypeMsgTCP.REPLY_SERVER,
@@ -372,7 +373,10 @@ public class ThreadReceiveTCPMsg extends Thread {
                                         List.of(false)
                                 )
                         );
-                    else
+
+                    else {
+                        Thread t = new ThreadPagamentoReserva(idReserva, connDB);
+                        t.start();
                         sendMsg(
                                 new MsgTcp(
                                         TypeMsgTCP.REPLY_SERVER,
@@ -380,6 +384,7 @@ public class ThreadReceiveTCPMsg extends Thread {
                                         List.of(true)
                                 )
                         );
+                    }
                 }
             }
         }

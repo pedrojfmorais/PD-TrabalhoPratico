@@ -12,8 +12,6 @@ public class Espetaculo implements Serializable {
     private final String designacao;
     private final String tipo;
     private final Date data;
-    /*String data;
-    String hora;*/
     private final int duracao;
     private final String local;
     private final String localidade;
@@ -27,7 +25,6 @@ public class Espetaculo implements Serializable {
         this.designacao = designacao;
         this.tipo = tipo;
         this.data = data;
-        // this.hora = hora;
         this.duracao = duracao;
         this.local = local;
         this.localidade = localidade;

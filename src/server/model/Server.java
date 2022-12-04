@@ -1,7 +1,7 @@
 package server.model;
 
 import server.communication.*;
-import server.ThreadRemoveOldServers;
+import server.otherThreads.ThreadRemoveOldServers;
 import server.model.data.Constants;
 import server.model.data.Heartbeat;
 import server.model.jdbc.ConnDB;

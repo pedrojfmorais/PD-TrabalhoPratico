@@ -1,5 +1,6 @@
 package server.communication;
 
+import server.model.data.Constants;
 import server.model.data.Heartbeat;
 import server.model.data.syncDB.Abort;
 import server.model.data.syncDB.Commit;
@@ -36,14 +37,10 @@ public class ThreadReceiveMulticast extends Thread {
 
             InetAddress address = InetAddress.getByName(IP_MULTICAST);
 
-            ms.joinGroup(address);
-            //TODO: alterar para versão comentada
-            /*
             SocketAddress sa = new InetSocketAddress(address, PORT_MULTICAST);
-            NetworkInterface ni = NetworkInterface.getByName("wlan1");
+            NetworkInterface ni = NetworkInterface.getByName(Constants.NETWORK_INTERFACE_NAME);
 
             ms.joinGroup(sa, ni);
-            */
 
             while (true) {
                 DatagramPacket dpRec = new DatagramPacket(new byte[4096], 0, 4096);
@@ -102,8 +99,6 @@ public class ThreadReceiveMulticast extends Thread {
                 listaServidores.add(h);
 
             Collections.sort(listaServidores);
-
-
 
             //TODO: Testing
             for (var a : listaServidores)

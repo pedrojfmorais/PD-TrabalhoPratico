@@ -82,10 +82,6 @@ abstract class ClientAdapter implements IClientState{
     public void selecionaLugaresPretendidos(List<String> lugares) { }
 
     @Override
-    public void validarReserva() {
-    }
-
-    @Override
     public void cancelarReserva() {
     }
 }

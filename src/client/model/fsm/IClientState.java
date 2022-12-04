@@ -31,7 +31,6 @@ public interface IClientState {
     //SELECIONA_ESPETACULO
     void mostraLugaresDisponiveis();
     void selecionaLugaresPretendidos(List<String> lugares);
-    void validarReserva();
     void cancelarReserva();
 
     //Todos

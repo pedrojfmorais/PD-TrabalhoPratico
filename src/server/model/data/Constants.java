@@ -15,4 +15,6 @@ public class Constants {
     public final static int TIMEOUT_STARTUP_PHASE = 5 * 1000; //TODO: 30
     public final static int TIMEOUT_WAIT_TCP_CONFIRMATION = 5 * 1000;
     public final static String DATABASE_CREATE_SCRIPT_PATH = "src/server/model/jdbc/createDbScript.sql";
+    public final static String NETWORK_INTERFACE_NAME = "eth7";
+    public final static int TIMEOUT_PAGAMENTO_RESERVA = 10 * 1000;
 }
