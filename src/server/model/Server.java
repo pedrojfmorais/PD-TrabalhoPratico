@@ -50,8 +50,9 @@ public class Server {
 
         allThreads.add(trm);
 
+        System.out.println("STARTUP");
         Thread.sleep(Constants.TIMEOUT_STARTUP_PHASE);
-
+        System.out.println("FIM STARTUP");
         boolean desatualizado = new File(BD_FILE).length() == 0;
 
         if(!desatualizado)

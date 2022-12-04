@@ -147,21 +147,8 @@ public class ThreadReceiveTCPMsg extends Thread {
                         && msg.getMsg().get(1) instanceof String nome
                         && msg.getMsg().get(2) instanceof String password) {
 
-                    if (!connDB.verifyUserExists(username, nome)) {
+                    if (!connDB.verifyUserExists(username, nome))
                         insertUser = connDB.insertUser(username, nome, password);
-//
-//                        if(dbSync) {
-//                            //PREPARE
-//                            System.out.println("PREPARE");
-//                            try {
-//                                if(KeepDatabaseConsistency.sendPrepare(msg, serverData.getLOCAL_DB_VERSION()+1,
-//                                        listaServidores, connDB))
-//
-//                            } catch (IOException e) {
-//                                throw new RuntimeException(e);
-//                            }
-//                        }
-                    }
 
                     sendMsg(
                             new MsgTcp(
