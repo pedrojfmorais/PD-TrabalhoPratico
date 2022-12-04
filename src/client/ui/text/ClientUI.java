@@ -78,9 +78,9 @@ public class ClientUI {
                 switch (PAInput.chooseOption("Pesquisa e Consulta de Espetaculo",
                         "Inserir Espetaculo", "Remover Espetaculo", "Tornar Espetaculo Visivel",
                         "Pesquisar", "Editar dados conta utilizador", "Logout")) {
-                    case 1 -> {
-                        //TODO: Mais logo
-                    }
+                    case 1 -> fsm.inserirEspetaculo(
+                            PAInput.readString("Insira o nome do ficheiro: ", false)
+                    );
                     case 2 -> fsm.removerEspetaculo(
                             PAInput.readLong("Insira o id do espetaculo a remover: ")
                     );

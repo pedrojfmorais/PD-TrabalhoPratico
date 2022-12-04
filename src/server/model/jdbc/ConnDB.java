@@ -238,6 +238,75 @@ public class ConnDB {
         return res;
     }
 
+    public boolean inserirEspetaculo(Espetaculo espetaculo) throws SQLException {
+
+        String sqlQuery = "INSERT INTO " + DatabaseTableNames.ESPETACULO.label
+                + " (" + TableEspetaculo.DESCRICAO.label + ", "
+                + TableEspetaculo.TIPO.label + ", "
+                + TableEspetaculo.DATA_HORA.label + ", "
+                + TableEspetaculo.DURACAO.label + ", "
+                + TableEspetaculo.LOCAL.label + ", "
+                + TableEspetaculo.LOCALIDADE.label + ", "
+                + TableEspetaculo.PAIS.label + ", "
+                + TableEspetaculo.CLASSIFICACAO_ETARIA.label + ", "
+                + TableEspetaculo.VISIVEL.label
+                + ") VALUES ('"
+                + espetaculo.getDesignacao() + "', '"
+                + espetaculo.getTipo() + "', '"
+                + Constants.formatterDate.format(espetaculo.getData()) + "', '"
+                + espetaculo.getDuracao() + "', '"
+                + espetaculo.getLocal() + "', '"
+                + espetaculo.getLocalidade() + "', '"
+                + espetaculo.getPais() + "', '"
+                + espetaculo.getClassificacao() + "', '"
+                + (espetaculo.isVisibilidade() ? "1" : "0") + "')";
+
+        int rowsAffected = dbConn.createStatement().executeUpdate(sqlQuery);
+
+        if (rowsAffected <= 0)
+            return false;
+
+        String sqlQueryGetIdEspetaculo = "SELECT " + TableEspetaculo.ID.label
+                + " FROM " + DatabaseTableNames.ESPETACULO.label
+                + " WHERE " + TableEspetaculo.DESCRICAO.label + "='" + espetaculo.getDesignacao() + "'"
+                + " AND "+ TableEspetaculo.TIPO.label + "='" + espetaculo.getTipo() + "'"
+                + " AND "+ TableEspetaculo.DATA_HORA.label + "='" + Constants.formatterDate.format(espetaculo.getData()) + "'"
+                + " AND "+ TableEspetaculo.DURACAO.label + "='" + espetaculo.getDuracao() + "'"
+                + " AND "+ TableEspetaculo.LOCAL.label + "='" + espetaculo.getLocal() + "'"
+                + " AND "+ TableEspetaculo.LOCALIDADE.label + "='" + espetaculo.getLocalidade() + "'"
+                + " AND "+ TableEspetaculo.PAIS.label + "='" + espetaculo.getPais() + "'"
+                + " AND "+ TableEspetaculo.CLASSIFICACAO_ETARIA.label + "='" + espetaculo.getClassificacao() + "'"
+                + " AND "+ TableEspetaculo.VISIVEL.label + "='" + (espetaculo.isVisibilidade() ? "1" : "0") + "'";
+
+        ResultSet resultSet = dbConn.createStatement().executeQuery(sqlQueryGetIdEspetaculo);
+        int idEspetaculo = 0;
+
+        while(resultSet.next())
+            idEspetaculo = resultSet.getInt(TableEspetaculo.ID.label);
+
+        if(idEspetaculo == 0)
+            return false;
+
+        System.out.println(idEspetaculo);
+
+        for (var lugar : espetaculo.getLugares()) {
+            String sqlQueryLugar = "INSERT INTO " + DatabaseTableNames.LUGAR.label
+                    + " ("
+                    + TableLugar.FILA.label + ", "
+                    + TableLugar.ASSENTO.label + ", "
+                    + TableLugar.PRECO.label + ", "
+                    + TableLugar.ESPETACULO_ID.label
+                    + ") VALUES ('"
+                    + lugar.getFila() + "', '"
+                    + lugar.getAssento() + "', '"
+                    + lugar.getPreco() + "', '"
+                    + idEspetaculo + "')";
+
+            dbConn.createStatement().executeUpdate(sqlQueryLugar);
+        }
+        return true;
+    }
+
     // O espetáculo apenas pode ser eliminado caso não existam reservas pagas.
     // Se existirem reservas por pagar, são eliminadas
     public boolean eliminarEspetaculo(int id) throws SQLException {

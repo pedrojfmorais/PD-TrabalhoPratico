@@ -58,18 +58,6 @@ public class ConsultaPesquisaEspetaculosState extends ClientAdapter {
         return true;
     }*/
 
-    private String prepareToSave(String token) {
-        do {
-            // Removes spaces at the beginning or ending
-            token = token.trim();
-
-            // Removes quotes
-            token = token.replaceAll("\"", "");
-
-        } while (token.startsWith("\"") || token.endsWith("\"") || token.startsWith(" ") || token.endsWith(" "));
-        return token;
-    }
-
     /*
      * Lugares de erro no exemplo:
      *  Tipo - Tem um : a separar, em vez de ;
@@ -77,89 +65,9 @@ public class ConsultaPesquisaEspetaculosState extends ClientAdapter {
      */
     @Override
     public boolean inserirEspetaculo(String filename) {
-
-        int id = 0;
-        boolean visibilidade = false;
-        String designacao = "";
-        String tipo = "";
-        Date date = new Date();
-        int duracao = 0;
-        String local = "";
-        String localidade = "";
-        String pais = "";
-        String classificacao = "";
-        List<Lugar> lugares = new ArrayList<>();
-
-        String dias = "", horas = "";
-
-        filename = "src/aMarcoTest/espetaculo.csv";
-
-        try (FileReader fr = new FileReader(filename);
-             BufferedReader br = new BufferedReader(fr)) {
-
-            String line;
-            String linePurpose;
-            while ((line = br.readLine()) != null) {
-                String[] tokens = line.split(";");
-                linePurpose = prepareToSave(tokens[0]);
-
-                if (linePurpose.equals("Designação")) {
-                    designacao = prepareToSave(tokens[1]);
-                } else if (linePurpose.equals("Tipo")) {
-                    tipo = prepareToSave(tokens[1]);
-                } else if (linePurpose.equals("Data")) {
-                    dias = prepareToSave(tokens[1]) + "/" +
-                            prepareToSave(tokens[2]) + "/" +
-                            prepareToSave(tokens[3]);
-                } else if (linePurpose.equals("Hora")) {
-                    horas = prepareToSave(tokens[1]) + ":" + prepareToSave(tokens[2]);
-                } else if (linePurpose.equals("Duração")) {
-                    duracao = Integer.parseInt(prepareToSave(tokens[1]));
-                } else if (linePurpose.equals("Local")) {
-                    local = prepareToSave(tokens[1]);
-                } else if (linePurpose.equals("Localidade")) {
-                    localidade = prepareToSave(tokens[1]);
-                } else if (linePurpose.equals("País")) {
-                    pais = prepareToSave(tokens[1]);
-                } else if (linePurpose.equals("Classificação etária")) {
-                    classificacao = prepareToSave(tokens[1]);
-                } else if (linePurpose.equals("Fila")) {
-                } else if (linePurpose.length() == 1) {
-                    // Remove first
-                    String[] modifiedTokens = Arrays.copyOfRange(tokens, 1, tokens.length);
-
-                    for (String tok : modifiedTokens) {
-                        // Separate seat from price
-                        String[] seat = prepareToSave(tok).split(":");
-                        // Create new Lugar
-                        Lugar lugar = new Lugar(0, linePurpose.toUpperCase(), seat[0], Double.parseDouble(seat[1]));
-
-                        // If seat has been registered, stop
-                        if (lugares.contains(lugar)) {
-                            //System.out.println("Errou " + linePurpose.toUpperCase() + " " + seat[0] + " " + seat[1]);
-                            return false;
-                        }
-                        lugares.add(lugar);
-                    }
-                } else {
-                    // If invalid field, stop
-                    if (linePurpose.length() != 0)
-                        return false;
-                    //System.out.println("MORREU " + line + " " + linePurpose);
-                }
-
-
-            }
-
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-
-        try {
-            date = new SimpleDateFormat(Constants.DATE_FORMAT).parse(dias + " " + horas);
-        } catch (ParseException e) {
-            throw new RuntimeException(e);
-        }
+        Espetaculo espetaculo = data.readFileEspetaculo(filename);
+        if (espetaculo == null)
+            return false;
 
         try {
 
@@ -167,14 +75,13 @@ public class ConsultaPesquisaEspetaculosState extends ClientAdapter {
                     new MsgTcp(
                             TypeMsgTCP.CLIENT,
                             MessagesTCPOperation.CLIENT_SERVER_INSERIR_ESPETACULO,
-                            List.of(new Espetaculo(id, visibilidade, designacao, tipo, date, duracao, local, localidade, pais, classificacao, lugares))
+                            List.of(espetaculo)
                     )
             );
 
         } catch (IOException | ClassNotFoundException e) {
             throw new RuntimeException(e);
         }
-
 
         return true;
     }

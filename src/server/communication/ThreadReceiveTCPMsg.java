@@ -189,6 +189,19 @@ public class ThreadReceiveTCPMsg extends Thread {
                         )
                 );
             }
+            case CLIENT_SERVER_INSERIR_ESPETACULO -> {
+                boolean result = false;
+                Espetaculo espetaculo = (Espetaculo) msg.getMsg().get(0);
+                result = connDB.inserirEspetaculo(espetaculo);
+
+                sendMsg(
+                        new MsgTcp(
+                                TypeMsgTCP.REPLY_SERVER,
+                                MessagesTCPOperation.CLIENT_SERVER_INSERIR_ESPETACULO,
+                                List.of(result)
+                        )
+                );
+            }
             case CLIENT_SERVER_ELIMINAR_ESPETACULO -> {
                 boolean result = false;
                 int id = (int) msg.getMsg().get(0);

@@ -127,6 +127,12 @@ public class ThreadTCPWithServer extends Thread {
                 for (var espetaculo : espetaculos)
                     ClientUI.showMessage(espetaculo + System.lineSeparator(), true);
             }
+            case CLIENT_SERVER_INSERIR_ESPETACULO -> {
+                if (msg.getMsg().get(0) instanceof Boolean b && b)
+                    ClientUI.showMessage("Espetaculo inserido com sucesso", false);
+                else
+                    ClientUI.showMessage("Erro a inserir o espetaculo", false);
+            }
             case CLIENT_SERVER_ELIMINAR_ESPETACULO -> {
                 if (msg.getMsg().get(0) instanceof Boolean b && b)
                     ClientUI.showMessage("Espetaculo eliminado com sucesso", false);

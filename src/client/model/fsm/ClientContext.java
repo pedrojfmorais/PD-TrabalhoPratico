@@ -46,6 +46,9 @@ public class ClientContext {
     }
     public boolean logout(){return state.logout();}
 
+    public void inserirEspetaculo(String filename){
+        state.inserirEspetaculo(filename);
+    }
     public void removerEspetaculo(long id){
         state.eliminarEspetaculo(Math.toIntExact(id));
     }
