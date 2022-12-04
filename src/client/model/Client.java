@@ -3,6 +3,7 @@ package client.model;
 import client.model.communication.ThreadTCPWithServer;
 import client.model.data.User;
 import client.model.fsm.ClientContext;
+import client.model.fsm.ClientState;
 import client.ui.text.ClientUI;
 import server.model.data.Constants;
 import server.model.data.LoginStatus;
@@ -66,6 +67,9 @@ public class Client {
         return tcpConnection;
     }
 
+    public void setListaServidores(List<ServerTCPConnection> listaServidores) {
+        this.listaServidores = listaServidores;
+    }
     public boolean tryConnectToServer() throws IOException {
         ServerTCPConnection serverTCPConnected = null;
         for (var server : listaServidores) {
@@ -95,6 +99,9 @@ public class Client {
         ClientUI.showMessage(
                 "Conectado ao servidor " + serverTCPConnected.getIP() + ":" + serverTCPConnected.getPORT(),
                 true);
+
+        if(fsm.getState() == ClientState.SELECIONA_ESPETACULO)
+            fsm.mostrarLugaresDisponiveis();
 
         return true;
     }

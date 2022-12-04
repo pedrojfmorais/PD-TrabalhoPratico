@@ -22,11 +22,11 @@ import java.util.stream.Collectors;
 
 public class ThreadTCPWithServer extends Thread {
 
-    final ClientContext fsm;
-    Socket serverSocket;
-    ObjectOutputStream oos;
-    ObjectInputStream ois;
-    List<ServerTCPConnection> listaServidores;
+    private final ClientContext fsm;
+    private Socket serverSocket;
+    private ObjectOutputStream oos;
+    private ObjectInputStream ois;
+    private List<ServerTCPConnection> listaServidores;
 
     public ThreadTCPWithServer(ClientContext fsm, Socket serverSocket,
                                List<ServerTCPConnection> listaServidores) throws IOException {
@@ -78,10 +78,13 @@ public class ThreadTCPWithServer extends Thread {
                     listaServidores = msg.getMsg().stream()
                             .map(object -> (ServerTCPConnection) object)
                             .collect(Collectors.toList());
+                    fsm.getData().setListaServidores(listaServidores);
                     close();
                 }
-                case SERVER_ASYNC_UPDATE_SERVER_LIST ->
-                        listaServidores = (List<ServerTCPConnection>) msg.getMsg().get(0);
+                case SERVER_ASYNC_UPDATE_SERVER_LIST -> {
+                    listaServidores = (List<ServerTCPConnection>) msg.getMsg().get(0);
+                    fsm.getData().setListaServidores(listaServidores);
+                }
             }
         }
 
@@ -163,11 +166,9 @@ public class ThreadTCPWithServer extends Thread {
                     ClientUI.showMessage("Reserva não existe ou já foi paga", false);
             }
             case CLIENT_SERVER_SELECIONAR_ESPETACULO -> {
-                if(msg.getMsg()== null) {
+                if (msg.getMsg() == null) {
                     ClientUI.showMessage("Espetaculo inexistente ou decorrará em menos de 24 horas", false);
-                }
-
-                else if(msg.getMsg().get(0) instanceof Espetaculo espetaculo){
+                } else if (msg.getMsg().get(0) instanceof Espetaculo espetaculo) {
                     fsm.getData().setEspetaculoSelecionado(espetaculo);
                     fsm.changeState(ClientState.SELECIONA_ESPETACULO.createState(fsm, fsm.getData()));
                     ClientUI.showMessage("", true);
@@ -177,8 +178,7 @@ public class ThreadTCPWithServer extends Thread {
                 if (msg.getMsg().get(0) instanceof Boolean b && b) {
                     ClientUI.showMessage("Reserva criada com sucesso", true);
                     fsm.changeState(ClientState.MINHAS_RESERVAS.createState(fsm, fsm.getData()));
-                }
-                else {
+                } else {
                     ClientUI.showMessage("Erro a criar a reserva", false);
                     fsm.changeState(ClientState.CONSULTA_PESQUISA_ESPETACULOS.createState(fsm, fsm.getData()));
                 }

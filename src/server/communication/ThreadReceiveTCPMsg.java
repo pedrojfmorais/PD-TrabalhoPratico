@@ -392,7 +392,6 @@ public class ThreadReceiveTCPMsg extends Thread {
 
     public void sendMsg(MsgTcp msgSend) {
         try {
-            oos.reset();
             oos.writeUnshared(msgSend);
 
         } catch (SocketException | EOFException ignored) {
