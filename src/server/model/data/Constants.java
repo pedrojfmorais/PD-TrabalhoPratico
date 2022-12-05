@@ -8,7 +8,7 @@ public class Constants {
     public static SimpleDateFormat formatterDate = new SimpleDateFormat(Constants.DATE_FORMAT, Locale.ENGLISH);
     public final static int INVALID_NUMBER_OF_ARGUMENTS = 1;
     public final static int PORT_MULTICAST = 4004;
-    public final static String IP_MULTICAST = "239.39.39.27";
+    public final static String IP_MULTICAST = "239.39.39.39";
     public final static int TIMEOUT_HEARTBEAT_MILLISECONDS = 10 * 1000;
     public final static int TIMEOUT_DATABASE_CONSISTENCY = 1000;
     public final static int TIMEOUT_REMOVE_OLD_SERVERS_MILLISECONDS = 35 * 1000;
