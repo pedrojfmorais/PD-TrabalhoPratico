@@ -41,11 +41,17 @@ public class AdminController {
                 || !principal.getTokenAttributes().get("scope").equals("ADMIN"))
             return new ResponseEntity<>("Unauthorized", HttpStatus.UNAUTHORIZED);
 
+        String res;
+
         try {
-            return new ResponseEntity<>(connDB.insertUser(user.getUsername(), user.getNome(), user.getPassword()), HttpStatus.OK);
+            if(connDB.insertUser(user.getUsername(), user.getNome(), user.getPassword()))
+                res = "Utilizador inserido com sucesso";
+            else
+                res = "Não é possivel inserir o utilizador";
         } catch (SQLException e) {
-            return new ResponseEntity<>(false, HttpStatus.OK);
+            res = "Erro a inserir o utilizador";
         }
+        return new ResponseEntity<>(res, HttpStatus.OK);
     }
 
     @DeleteMapping("utilizador")
@@ -54,10 +60,17 @@ public class AdminController {
                 || !principal.getTokenAttributes().get("scope").equals("ADMIN"))
             return new ResponseEntity<>("Unauthorized", HttpStatus.UNAUTHORIZED);
 
+        String res;
+
         try {
-            return new ResponseEntity<>(connDB.deleteUser(username), HttpStatus.OK);
+            if(connDB.deleteUser(username))
+                res = "Utilizador removido com sucesso";
+            else
+                res = "Não é possivel remover o utilizador";
         } catch (SQLException e) {
-            return new ResponseEntity<>(false, HttpStatus.OK);
+            res = "Erro a remover o utilizador";
         }
+
+        return new ResponseEntity<>(res, HttpStatus.OK);
     }
 }
