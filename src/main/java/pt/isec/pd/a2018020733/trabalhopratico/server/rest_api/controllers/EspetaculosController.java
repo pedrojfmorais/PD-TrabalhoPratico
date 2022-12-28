@@ -4,11 +4,8 @@ import org.springframework.security.oauth2.server.resource.authentication.JwtAut
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.client.HttpClientErrorException;
-import pt.isec.pd.a2018020733.trabalhopratico.server.model.data.LoginStatus;
 import pt.isec.pd.a2018020733.trabalhopratico.server.model.data.viewModels.Espetaculo;
 
-import java.security.Principal;
 import java.sql.SQLException;
 import java.text.ParseException;
 import java.util.List;
@@ -24,11 +21,12 @@ public class EspetaculosController {
             @RequestParam(value="dataInicio", required=false) String dataInicio,
             @RequestParam(value="dataFim", required=false) String dataFim)
     {
+
         List<Espetaculo> espetaculos;
         try {
             boolean isAdmin =
                     principal != null
-                    && connDB.getUserType(principal.getName()) == LoginStatus.SUCCESSFUL_ADMIN_USER;
+                    && principal.getTokenAttributes().get("scope").equals("ADMIN");
 
             espetaculos = connDB.pesquisarEspetaculo(dataInicio, dataFim, isAdmin);
         } catch (ParseException | SQLException e) {

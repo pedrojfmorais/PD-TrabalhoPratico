@@ -65,8 +65,6 @@ public class Application {
                     .csrf(csrf -> csrf.disable())
                     .authorizeHttpRequests(auth -> auth
                             .requestMatchers("/espetaculos").permitAll()
-
-                            //TODO: algumas são só para o admin
                             .anyRequest().authenticated()
                     )
                     .oauth2ResourceServer(OAuth2ResourceServerConfigurer::jwt)
