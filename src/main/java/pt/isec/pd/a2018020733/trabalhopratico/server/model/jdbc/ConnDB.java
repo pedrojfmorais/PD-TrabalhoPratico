@@ -150,19 +150,60 @@ public class ConnDB {
     }
 
     public boolean deleteUser(String username) throws SQLException {
-        Statement statement = dbConn.createStatement();
+        /*
+        No caso de inserção e eliminação de utilizadores, deve ter-se em atenção as condições em
+        que as operações não devem ter sucesso (e.g., utilizador existente / não existente, utilizador
+        identificado como autenticado na base de dados, utilizador com reservas associadas, etc.).
+         */
 
-        String sqlQuery = "DELETE FROM " + DatabaseTableNames.UTILIZADOR.label
-                + " WHERE " + TableUtilizador.USERNAME.label + " ='" + username + "'";
+        // Não existe user
+        // User autenticado na bd
+        // User com reservas associadas
 
-        int rowsAffected = statement.executeUpdate(sqlQuery);
-        statement.close();
+        String sqlQuery = "SELECT * FROM " + DatabaseTableNames.UTILIZADOR.label
+                + " WHERE " + TableUtilizador.USERNAME.label + "='" + username + "'";
 
-        if (rowsAffected == 1) {
-            incrementDBVersion();
-            return true;
+        ResultSet resultSet = dbConn.createStatement().executeQuery(sqlQuery);
+        if(resultSet.next()) {
+            int userId = resultSet.getInt(TableUtilizador.ID.label);
+
+            if(resultSet.getInt(TableUtilizador.AUTENTICADO.label) == 0) {
+                // Não está autenticado
+                sqlQuery = "SELECT COUNT(*) FROM " + DatabaseTableNames.RESERVA.label
+                        + " WHERE " + TableReserva.ID_UTILIZADOR.label + "='" + userId + "'";
+
+                resultSet = dbConn.createStatement().executeQuery(sqlQuery);
+
+                if(resultSet.next()) {
+                    if(resultSet.getInt(1) > 0) {
+                        // Falhou porque tem reservas
+                        resultSet.close();
+                        return false;
+                    }
+                }
+                //Eliminar utilizador
+                sqlQuery = "DELETE FROM " + DatabaseTableNames.UTILIZADOR.label
+                        + " WHERE " + TableUtilizador.USERNAME.label + " ='" + username + "'";
+
+                int rowsAffected = dbConn.createStatement().executeUpdate(sqlQuery);
+
+                if (rowsAffected == 1) {
+                    incrementDBVersion();
+                    return true;
+                }
+                return false;
+            }
+            else {
+                // Falhou porque está autenticado
+                resultSet.close();
+                return false;
+            }
+
+        } else {
+            // Falhou porque não existe
+            resultSet.close();
+            return false;
         }
-        return false;
     }
 
     public boolean updateUser(String oldUsername, String username, String nome, String password) throws SQLException {
@@ -849,59 +890,5 @@ public class ConnDB {
                 + idLugar + "');";
 
         return dbConn.createStatement().executeUpdate(sqlQueryAdicionaReservaLugar) > 0;
-    }
-
-
-    public boolean eliminaUser(String username) throws SQLException {
-        /*
-        No caso de inserção e eliminação de utilizadores, deve ter-se em atenção as condições em
-        que as operações não devem ter sucesso (e.g., utilizador existente / não existente, utilizador
-        identificado como autenticado na base de dados, utilizador com reservas associadas, etc.).
-         */
-
-        // Não existe user
-        // User autenticado na bd
-        // User com reservas associadas
-        Statement statement = dbConn.createStatement();
-
-        String sqlQuery = "SELECT * FROM " + DatabaseTableNames.UTILIZADOR.label
-                + " WHERE " + TableUtilizador.USERNAME.label + "='" + username + "'";
-
-        ResultSet resultSet = statement.executeQuery(sqlQuery);
-        if(resultSet.next()) {
-            int userId = resultSet.getInt(TableUtilizador.ID.label);
-
-            if(resultSet.getInt(TableUtilizador.AUTENTICADO.label) == 0) {
-                // Não está autenticado
-                sqlQuery = "SELECT COUNT(*) FROM " + DatabaseTableNames.RESERVA.label
-                        + " WHERE " + TableReserva.ID_UTILIZADOR.label + "='" + userId + "'";
-
-                resultSet = statement.executeQuery(sqlQuery);
-
-                if(resultSet.next()) {
-                    if(resultSet.getInt(1) > 0) {
-                        // Falhou porque tem reservas
-                        resultSet.close();
-                        statement.close();
-                        return false;
-                    }
-                    // TODO Eliminar aqui
-                }
-            }
-            else {
-                // Falhou porque está autenticado
-                resultSet.close();
-                statement.close();
-                return false;
-            }
-
-        } else {
-            // Falhou porque não existe
-            resultSet.close();
-            statement.close();
-            return false;
-        }
-
-        return false;
     }
 }
