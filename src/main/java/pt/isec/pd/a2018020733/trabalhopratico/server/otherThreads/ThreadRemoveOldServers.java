@@ -8,7 +8,7 @@ import java.util.List;
 
 import static pt.isec.pd.a2018020733.trabalhopratico.server.model.data.Constants.TIMEOUT_REMOVE_OLD_SERVERS_MILLISECONDS;
 
-public class ThreadRemoveOldServers extends Thread{
+public class ThreadRemoveOldServers extends Thread {
 
     private final List<Heartbeat> listaServidores;
     private SendListaServidoresClientesTCP atualizaClientes;
@@ -22,17 +22,19 @@ public class ThreadRemoveOldServers extends Thread{
     public void run() {
         try {
 
-            while (true){
+            while (true) {
                 Thread.sleep(TIMEOUT_REMOVE_OLD_SERVERS_MILLISECONDS);
 
                 Date curTime = new Date();
 
-                synchronized (listaServidores){
+                synchronized (listaServidores) {
                     listaServidores.removeIf(
                             server ->
-                                    ((curTime.getTime() - server.getReceivedAt().getTime())
-                                            > TIMEOUT_REMOVE_OLD_SERVERS_MILLISECONDS)
-                                     || !server.isDISPONIVEL());
+                                    (server.getReceivedAt() != null &&
+                                            (curTime.getTime() - server.getReceivedAt().getTime())
+                                                    > TIMEOUT_REMOVE_OLD_SERVERS_MILLISECONDS)
+                                            || !server.isDISPONIVEL()
+                    );
                 }
                 atualizaClientes.enviarLista();
             }

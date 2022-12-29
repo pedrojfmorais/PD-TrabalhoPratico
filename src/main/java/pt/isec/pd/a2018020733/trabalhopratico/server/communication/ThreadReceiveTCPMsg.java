@@ -1,5 +1,6 @@
 package pt.isec.pd.a2018020733.trabalhopratico.server.communication;
 
+import pt.isec.pd.a2018020733.trabalhopratico.rmi_client.RmiClientRemoteInterface;
 import pt.isec.pd.a2018020733.trabalhopratico.server.model.data.LoginStatus;
 import pt.isec.pd.a2018020733.trabalhopratico.server.model.data.TCP.MessagesTCPOperation;
 import pt.isec.pd.a2018020733.trabalhopratico.server.model.data.TCP.MsgTcp;
@@ -16,6 +17,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.net.SocketException;
+import java.rmi.RemoteException;
 import java.sql.SQLException;
 import java.text.ParseException;
 import java.util.ArrayList;
@@ -33,15 +35,20 @@ public class ThreadReceiveTCPMsg extends Thread {
     private final ObjectOutputStream oos;
     private final ObjectInputStream ois;
     private boolean threadContinue = true;
+    List<RmiClientRemoteInterface> clientsRmi;
+    String nomeUserLogado;
 
     public ThreadReceiveTCPMsg(Socket cliSocket, ConnDB connDB,
                                Heartbeat serverData, SendListaServidoresClientesTCP atualizaClientes,
-                               List<Heartbeat> listaServidores) throws IOException {
+                               List<Heartbeat> listaServidores,
+                               List<RmiClientRemoteInterface> clientsRmi) throws IOException {
         this.cliSocket = cliSocket;
         this.connDB = connDB;
         this.serverData = serverData;
         this.atualizaClientes = atualizaClientes;
         this.listaServidores = listaServidores;
+        this.clientsRmi = clientsRmi;
+        this.nomeUserLogado = null;
 
         oos = new ObjectOutputStream(cliSocket.getOutputStream());
         ois = new ObjectInputStream(cliSocket.getInputStream());
@@ -55,6 +62,20 @@ public class ThreadReceiveTCPMsg extends Thread {
             try {
                 msgRec = (MsgTcp) ois.readObject();
             } catch (SocketException | EOFException e) {
+
+                for (var clientRmi : clientsRmi) {
+                    try {
+                        clientRmi.receiveNotificationAsync("Perda de ligação com o cliente "
+                                        + cliSocket.getInetAddress().getHostAddress() + ":" + cliSocket.getPort() +
+                                        (nomeUserLogado == null? "" : "\nO utilizador '"
+                                                + nomeUserLogado + "' estava logado!"));
+                    } catch (RemoteException re) {
+                        throw new RuntimeException(re);
+                    }
+                }
+
+                nomeUserLogado = null;
+
                 close();
                 break;
             } catch (IOException | ClassNotFoundException e) {
@@ -125,6 +146,18 @@ public class ThreadReceiveTCPMsg extends Thread {
                         && msg.getMsg().get(1) instanceof String password) {
                     ls = connDB.verifyLogin(username, password);
                 }
+
+                if (ls == LoginStatus.SUCCESSFUL_ADMIN_USER || ls == LoginStatus.SUCCESSFUL_NORMAL_USER) {
+                    this.nomeUserLogado = (String) msg.getMsg().get(0);
+                    for (var clientRmi : clientsRmi) {
+                        try {
+                            clientRmi.receiveNotificationAsync("O utilizador '" + nomeUserLogado + "' fez login");
+                        } catch (RemoteException e) {
+                            throw new RuntimeException(e);
+                        }
+                    }
+                }
+
                 sendMsg(
                         new MsgTcp(
                                 TypeMsgTCP.REPLY_SERVER,
@@ -137,6 +170,15 @@ public class ThreadReceiveTCPMsg extends Thread {
                 if (msg.getMsg().get(0) instanceof String username)
                     connDB.logout(username);
 
+                this.nomeUserLogado = null;
+
+                for (var clientRmi : clientsRmi) {
+                    try {
+                        clientRmi.receiveNotificationAsync("O utilizador '" + msg.getMsg().get(0) + "' fez logout");
+                    } catch (RemoteException e) {
+                        throw new RuntimeException(e);
+                    }
+                }
             }
             case CLIENT_SERVER_REGISTER -> {
 

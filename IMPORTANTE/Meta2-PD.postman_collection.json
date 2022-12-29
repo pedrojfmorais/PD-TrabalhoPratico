@@ -1,0 +1,266 @@
+{
+	"info": {
+		"_postman_id": "8cb9d234-ffa7-4011-8806-d1fdd122a943",
+		"name": "Meta2-PD",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "localhost:8080/login",
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "username",
+							"value": "uio_",
+							"type": "string"
+						},
+						{
+							"key": "password",
+							"value": "uio",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"url": {
+					"raw": "localhost:8080/login",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "localhost:8080/espetaculos",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJSUzI1NiJ9.eyJpc3MiOiJzZWxmIiwic3ViIjoiYXNkIiwiZXhwIjoxNjcyMjQ3Nzk3LCJpYXQiOjE2NzIyNDc2NzcsInNjb3BlIjoiVVNFUiJ9.cspz1zN083aZCXM4FwUSKZnHdcmdCfLQHwYYj_2JFD1agkhef0DH6JAyUzfZPEBYgc0D1cBTkrZH_nRDWrFys88gwBe6d51-U46xLd3UICti6owiSieFWFCbT8VyZ0nDL5e9uDiy0Vi6egncEUEApEZ9tEBXADsYjK33hncSn1OlmsOTnuZdEM4z_JMvdTUBeQX1zb7sttxNrzrp_UTx9VHUeZFPrmBN_2n3ZU025lgqXqnpEAx3vDoT8BRQFwlDXJQW6A3ZcI6LOc5qZEfLlY-htWWTsYPFfdDOyaXPTuhUqBmj2WkLykz1K0B5HeP9XYi1npZGEUOdtNx9jvXwLQ",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "localhost:8080/espetaculos",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"espetaculos"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "localhost:8080/espetaculos datas",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJSUzI1NiJ9.eyJpc3MiOiJzZWxmIiwic3ViIjoidWlvIiwiZXhwIjoxNjcyMDExNDI4LCJpYXQiOjE2NzIwMDc4MjgsInNjb3BlIjoiQURNSU4ifQ.SiH_gruLxE0R30jPm3mKVVYYqunWpqYOM4MGI97FEwobeSmtaY1N_tkud_T1-rzZGVzE6qHogrg1GAyoBJyNJ3MpbfTiQeAPoNqtoFWQ5wipnP2zPL9i1ULKKZElCI7qgFEFjK9W1tiryeIxRls8Dv0PX4I0m1jUyQEJZ08ZhSdLUD3TiOWojJNPZa8WJQuVNIhybXI074oNuwDnlESrbBrot6By0fh1AqnmZDq0lYfWB7730QwnBUVxq9czBVR2Qp3iVS2xx7Wl_4oolubxHJtGyJplCSp3RotgsLIRBe4llQQNIzjToRXQnTThWqro5wj4KfVNyyyp9Ej6TaOmkg",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "localhost:8080/espetaculos?dataInicio=14/11/1998 20:34&dataFim=01/01/1999 00:30",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"espetaculos"
+					],
+					"query": [
+						{
+							"key": "dataInicio",
+							"value": "14/11/1998 20:34"
+						},
+						{
+							"key": "dataFim",
+							"value": "01/01/1999 00:30"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "localhost:8080/reservas/pagas",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJSUzI1NiJ9.eyJpc3MiOiJzZWxmIiwic3ViIjoiYXNkIiwiZXhwIjoxNjcyMjQ3Njg3LCJpYXQiOjE2NzIyNDc1NjcsInNjb3BlIjoiVVNFUiJ9.dRQ-VtemOXWRV3KboGqIhY1nRxr8uwqQz8z6HFGCPHI5s7E_Q6BtSMYCINcMiL0LD-La6Cstds1ZRC7Me9SjJDZIN3bNHcPgqvw6opYCz6gFxAsE4c1HDdfYkEUwoaEm-Zc8XoDzDjEsXMUhFqTO2gas99cZpEh7r4WUlJy4PfJ3oAwn3oizSA4S54LU5rHJyYZQfxyAAfxJWNk9jsj3TU3xiLoqgzlUThpdybgadvW4IAFYW84v7dSOyhK4SsRiSKePlD2ENkSdjcAaYsnq2fLou7lS5fY4fMH2CYNTa7gX2CkaUcCyv74YSF2k9ZcgfCVxIS8b9k5zu6ZL-XI-UA",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "localhost:8080/reservas/pagas",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"reservas",
+						"pagas"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "localhost:8080/reservas/aguardar-pagamento",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJSUzI1NiJ9.eyJpc3MiOiJzZWxmIiwic3ViIjoidWlvXyIsImV4cCI6MTY3MjI0NzcwOSwiaWF0IjoxNjcyMjQ3NTg5LCJzY29wZSI6IkFETUlOIn0.Ud_Jkc555F7R98mpdFmvzMNpUvAvTHbhHyUxjSAly7If2GS51SQ5sPzQu1t94aXuHEXoqQDEqG9ckK96craEq609CW4lWyei1ssANgGwCU4mozrIvyBUDWww_HlXXtqhVboAX3ILg6Z44dD7xt76TzqrrEjhQ0vMaAXPbcuv8GHOn_xotG2zCR9vFOtFVLGdrIxODjOgVvEM1wyF4KEdoEtcyxPYlDdTKd1QzAYmlb7kisbL5Wq7Z01JA0Hg8FZIkn9-8FVqw2mPEPkn2kZPZxyKcm_sXbL-y9uW3oHXe2WFJNhtd4T6Y2UnIM_V5UXJtJxcs3WdZjTjoGUPrRZ7Lg",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "localhost:8080/reservas/aguardar-pagamento",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"reservas",
+						"aguardar-pagamento"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "localhost:8080/admin/utilizadores",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJSUzI1NiJ9.eyJpc3MiOiJzZWxmIiwic3ViIjoidWlvXyIsImV4cCaI6MTY3MjI0OTU4NiwiaWF0IjoxNjcyMjQ5NDY2LCJzY29wZSI6IkFETUlOIn0.k7cnLZNXNTDTXNj0jObNrfQNUSDEj4kmHFwlL3aybFpmfufylDcQAYs46eNbZaLBPTBqHDhjQJ7D-vxJGmu5GqrBrLuOsYGE5cCEKnEEXgpUUYtLAol8L4irvN55o_ZPCLEUPHWImpmebRl9hOx4e_649EvyAnf3VmnFUbLlIhpSmZaFNZx6sIa2ARomB4b-JCqVoflHlkEQFWZup0UcI2HiDKmoSG46T-20JwygS7lWN9xzHcSgb2ITKaAWJIMUlGMfrybwDcfFgl2sB_z0ExipiUjjQTaqOq-y05j3hLhMvPR6rK2-XiJFiddbLow9cUKYzHTos-AENrpGDmi4pAa",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "localhost:8080/admin/utilizadores",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"admin",
+						"utilizadores"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "localhost:8080/admin/utilizador",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJSUzI1NiJ9.eyJpc3MiOiJzZWxmIiwic3ViIjoidWlvXyIsImV4cCI6MTY3MjI1MDAxNywiaWF0IjoxNjcyMjQ5ODk3LCJzY29wZSI6IkFETUlOIn0.SpeiNxAkC4hcAayS5Ve0DlhLgW0fkR6hF-yikXP1aKjUExnl8xgDnVvK-wpzTMJ_66lkygqjWwqq1g_4m0alIZMWeJ1DCBGND570jeWdGnpqJvzyR-zta0tengRIhCNZKJP9aCTQsgG4iyb8RVMWLCb58NuYYLq1T67btmV7YhNkww1iTZPmNORh1Nbk4yUJwFINLYGHcEnwuVQ7S3wTXM4W0K9mrt_INBbi79eBrQ-hzv0SMayqLl_qEAOKLeXnSrLSzRduBNZ4vR6yfV0DRAUs2vaXja67eTuLiyHbY1uhys5RsEdnjy6ux6q5hhZiJXfPHdINF3tOeukyZ2r1zA",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"username\": \"pedrojfmorais\",\r\n    \"nome\": \"Pedro Morais\",\r\n    \"password\": \"1qazZAQ!\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:8080/admin/utilizador",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"admin",
+						"utilizador"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "localhost:8080/admin/utilizador",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJSUzI1NiJ9.eyJpc3MiOiJzZWxmIiwic3ViIjoidWlvXyIsImV4cCI6MTY3MjI1MDAxNywiaWF0IjoxNjcyMjQ5ODk3LCJzY29wZSI6IkFETUlOIn0.SpeiNxAkC4hcAayS5Ve0DlhLgW0fkR6hF-yikXP1aKjUExnl8xgDnVvK-wpzTMJ_66lkygqjWwqq1g_4m0alIZMWeJ1DCBGND570jeWdGnpqJvzyR-zta0tengRIhCNZKJP9aCTQsgG4iyb8RVMWLCb58NuYYLq1T67btmV7YhNkww1iTZPmNORh1Nbk4yUJwFINLYGHcEnwuVQ7S3wTXM4W0K9mrt_INBbi79eBrQ-hzv0SMayqLl_qEAOKLeXnSrLSzRduBNZ4vR6yfV0DRAUs2vaXja67eTuLiyHbY1uhys5RsEdnjy6ux6q5hhZiJXfPHdINF3tOeukyZ2r1zA",
+							"type": "string"
+						}
+					]
+				},
+				"method": "DELETE",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "pedrojfmorais"
+				},
+				"url": {
+					"raw": "localhost:8080/admin/utilizador",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"admin",
+						"utilizador"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

@@ -2,6 +2,7 @@ package pt.isec.pd.a2018020733.trabalhopratico.server.model;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.context.ApplicationContextException;
+import pt.isec.pd.a2018020733.trabalhopratico.rmi_client.RmiClientRemoteInterface;
 import pt.isec.pd.a2018020733.trabalhopratico.server.communication.*;
 import pt.isec.pd.a2018020733.trabalhopratico.server.communication.*;
 import pt.isec.pd.a2018020733.trabalhopratico.server.otherThreads.ThreadRemoveOldServers;
@@ -9,9 +10,16 @@ import pt.isec.pd.a2018020733.trabalhopratico.server.model.data.Constants;
 import pt.isec.pd.a2018020733.trabalhopratico.server.model.data.Heartbeat;
 import pt.isec.pd.a2018020733.trabalhopratico.server.model.jdbc.ConnDB;
 import pt.isec.pd.a2018020733.trabalhopratico.server.rest_api.Application;
+import pt.isec.pd.a2018020733.trabalhopratico.server.rmi.RmiServer;
+import pt.isec.pd.a2018020733.trabalhopratico.server.rmi.RmiServerRemoteInterface;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+import java.rmi.RemoteException;
+import java.rmi.registry.LocateRegistry;
+import java.rmi.registry.Registry;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
@@ -26,6 +34,7 @@ public class Server {
     private Heartbeat serverData;
     private final List<Heartbeat> listaServidores;
     private final List<ThreadReceiveTCPMsg> listaClientes;
+    private final List<RmiClientRemoteInterface> clientesRmi;
 
     private SendListaServidoresClientesTCP atualizaClientes;
 
@@ -43,8 +52,14 @@ public class Server {
         allThreads = new ArrayList<>();
         listaServidores = new ArrayList<>();
         listaClientes = new ArrayList<>();
-        serverData = new Heartbeat(myTCPPort, false, localDbVersion, 0);
+        serverData = new Heartbeat(myTCPPort, UDP_PORT, false, localDbVersion, 0);
         atualizaClientes = new SendListaServidoresClientesTCP(listaServidores, listaClientes);
+        clientesRmi = new ArrayList<>();
+        try {
+            serverData.setIpServer(InetAddress.getLocalHost().getHostAddress());
+        } catch (UnknownHostException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public void start() throws InterruptedException {
@@ -86,7 +101,9 @@ public class Server {
 
         //Quando tudo estiver ok
         serverData.setDISPONIVEL(true);
+        listaServidores.add(serverData);
 
+        // API REST
         Thread httpRestApi = new Thread(
                 () -> {
                     try {
@@ -100,15 +117,50 @@ public class Server {
 
         httpRestApi.start();
 
-        startThreads();
+        // RMI
+        String serverRegistration = "rmi://" + RmiServerRemoteInterface.SERVER_NAME_PREFIX + UDP_PORT + "/";
+        Registry r = null;
+        RmiServer rmiServer;
+        try {
 
+            rmiServer = new RmiServer(listaServidores, UDP_PORT, clientesRmi);
+        } catch (RemoteException e) {
+            throw new RuntimeException(e);
+        }
+        try {
+            r = LocateRegistry.createRegistry(Registry.REGISTRY_PORT);
+        } catch (RemoteException ignored) {
+            try {
+                r = LocateRegistry.getRegistry(Registry.REGISTRY_PORT);
+            } catch (RemoteException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        try {
+            r.rebind(
+                    serverRegistration + RmiServerRemoteInterface.REGISTRY_BIND_NAME_LIST_SERVERS,
+                    rmiServer
+            );
+            r.rebind(
+                    serverRegistration + RmiServerRemoteInterface.REGISTRY_BIND_NAME_ADD_LISTENER,
+                    rmiServer
+            );
+            r.rebind(
+                    serverRegistration + RmiServerRemoteInterface.REGISTRY_BIND_NAME_REMOVE_LISTENER,
+                    rmiServer
+            );
+        } catch (RemoteException e) {
+            throw new RuntimeException(e);
+        }
+
+        startThreads();
     }
 
     public void startThreads() {
 
 
         ThreadReceiveNewTCPConnection trtcpc = new ThreadReceiveNewTCPConnection(
-                serverData, listaClientes, connDB, atualizaClientes, listaServidores
+                serverData, listaClientes, connDB, atualizaClientes, listaServidores, clientesRmi
         );
         trtcpc.start();
 
@@ -124,7 +176,7 @@ public class Server {
 
         allThreads.add(tros);
 
-        ThreadReceiveUDPClients trupdc = new ThreadReceiveUDPClients(listaServidores, UDP_PORT);
+        ThreadReceiveUDPClients trupdc = new ThreadReceiveUDPClients(listaServidores, UDP_PORT, clientesRmi);
         trupdc.start();
 
         allThreads.add(trupdc);

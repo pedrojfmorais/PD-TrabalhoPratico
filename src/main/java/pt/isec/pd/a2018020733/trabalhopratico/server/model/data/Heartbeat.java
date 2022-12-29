@@ -6,16 +6,26 @@ import java.util.Date;
 public class Heartbeat implements Comparable<Heartbeat>, Serializable {
     private String ipServer;
     private int TCP_PORT;
+    private int UDP_PORT;
     private boolean DISPONIVEL;
     private int LOCAL_DB_VERSION;
     private int NUMERO_LIGACOES_TCP;
     private Date receivedAt;
 
-    public Heartbeat(int TCP_PORT, boolean DISPONIVEL, int LOCAL_DB_VERSION, int NUMERO_LIGACOES_TCP) {
+    public Heartbeat(int TCP_PORT, int UDP_PORT, boolean DISPONIVEL, int LOCAL_DB_VERSION, int NUMERO_LIGACOES_TCP) {
         this.TCP_PORT = TCP_PORT;
+        this.UDP_PORT = UDP_PORT;
         this.DISPONIVEL = DISPONIVEL;
         this.LOCAL_DB_VERSION = LOCAL_DB_VERSION;
         this.NUMERO_LIGACOES_TCP = NUMERO_LIGACOES_TCP;
+    }
+
+    public int getUDP_PORT() {
+        return UDP_PORT;
+    }
+
+    public void setUDP_PORT(int UDP_PORT) {
+        this.UDP_PORT = UDP_PORT;
     }
 
     public int getTCP_PORT() {

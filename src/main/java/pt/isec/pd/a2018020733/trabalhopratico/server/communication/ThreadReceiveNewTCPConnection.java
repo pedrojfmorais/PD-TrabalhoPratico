@@ -1,5 +1,6 @@
 package pt.isec.pd.a2018020733.trabalhopratico.server.communication;
 
+import pt.isec.pd.a2018020733.trabalhopratico.rmi_client.RmiClientRemoteInterface;
 import pt.isec.pd.a2018020733.trabalhopratico.server.model.data.Heartbeat;
 import pt.isec.pd.a2018020733.trabalhopratico.server.model.jdbc.ConnDB;
 
@@ -13,6 +14,7 @@ public class ThreadReceiveNewTCPConnection extends Thread{
 
     private final List<Thread> listThreadsTCPConnections;
     private final List<ThreadReceiveTCPMsg> listaClientes;
+    List<RmiClientRemoteInterface> clientsRmi;
     private final List<Heartbeat> listaServidores;
     private SendListaServidoresClientesTCP atualizaClientes;
     private final Heartbeat serverData;
@@ -21,7 +23,8 @@ public class ThreadReceiveNewTCPConnection extends Thread{
 
     public ThreadReceiveNewTCPConnection(Heartbeat serverData, List<ThreadReceiveTCPMsg> listaClientes,
                                          ConnDB connDB, SendListaServidoresClientesTCP atualizaClientes,
-                                         List<Heartbeat> listaServidores) {
+                                         List<Heartbeat> listaServidores,
+                                         List<RmiClientRemoteInterface> clientsRmi) {
         this.serverData = serverData;
         this.listaClientes = listaClientes;
         this.connDB = connDB;
@@ -29,6 +32,7 @@ public class ThreadReceiveNewTCPConnection extends Thread{
         this.listaServidores = listaServidores;
 
         listThreadsTCPConnections = new ArrayList<>();
+        this.clientsRmi = clientsRmi;
 
     }
 
@@ -47,8 +51,14 @@ public class ThreadReceiveNewTCPConnection extends Thread{
 
                 Socket cliSocket = ss.accept();
 
+                for (var clientRmi : clientsRmi) {
+                    clientRmi.receiveNotificationAsync(
+                            "Novo cliente via TCP "
+                                    + cliSocket.getInetAddress().getHostAddress() + ":" + cliSocket.getPort());
+                }
+
                 ThreadReceiveTCPMsg t = new ThreadReceiveTCPMsg(cliSocket, connDB, serverData,
-                        atualizaClientes, listaServidores);
+                        atualizaClientes, listaServidores, clientsRmi);
                 t.start();
 
                 synchronized (listaClientes) {
