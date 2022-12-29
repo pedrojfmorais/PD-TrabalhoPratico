@@ -1,6 +1,7 @@
 # PD-TrabalhoPratico
 
-Pasta IMPORTANTE
+Pasta IMPORTANTE:
+
   Import par ao Postman -> Meta2-PD.postman_collection.json 
   
   Run configurations -> Parâmetros para meter a correr.txt
