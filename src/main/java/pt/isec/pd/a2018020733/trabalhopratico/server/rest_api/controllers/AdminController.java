@@ -44,7 +44,7 @@ public class AdminController {
         String res;
 
         try {
-            if(connDB.insertUser(user.getUsername(), user.getNome(), user.getPassword()))
+            if(connDB.insertUser(user.username(), user.nome(), user.password()))
                 res = "Utilizador inserido com sucesso";
             else
                 res = "Não é possivel inserir o utilizador";
